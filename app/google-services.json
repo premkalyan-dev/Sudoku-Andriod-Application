@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "259071649640",
+    "project_id": "sudoku-bf166",
+    "storage_bucket": "sudoku-bf166.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:259071649640:android:96d3e2759470e7e94ed8dd",
+        "android_client_info": {
+          "package_name": "com.prem.skudo"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "259071649640-lvueb3a1orq4ae7lp0ic94v61b63gdmk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.prem.skudo",
+            "certificate_hash": "1b2d03cdbaebc169c4b0c27b16283f9c774b5720"
+          }
+        },
+        {
+          "client_id": "259071649640-lgapt05j95ijjs4gbu7dod01cqqdi7fu.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyARF8dKaeT5pJxBwsleihlpJUo9qo4QGo0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "259071649640-lgapt05j95ijjs4gbu7dod01cqqdi7fu.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
