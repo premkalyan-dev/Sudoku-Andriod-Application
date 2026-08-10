@@ -18,6 +18,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -56,11 +57,60 @@ fun PremiumRewardScreen(
         ) {
             AnimatedVisibility(
                 visible = visible,
-                enter = fadeIn() + scaleIn(initialScale = 0.8f),
+                enter = fadeIn() + scaleIn(initialScale = 0.8f, animationSpec = spring(Spring.DampingRatioMediumBouncy)),
                 exit = fadeOut() + scaleOut()
             ) {
-                RewardContent(state, onPlayAgain, onHome)
+                Box(contentAlignment = Alignment.Center) {
+                    RewardContent(state, onPlayAgain, onHome)
+                    ConfettiOverlay(visible)
+                }
             }
+        }
+    }
+}
+
+@Composable
+fun ConfettiOverlay(visible: Boolean) {
+    if (!visible) return
+    val infiniteTransition = rememberInfiniteTransition(label = "confetti")
+    
+    Box(modifier = Modifier.fillMaxSize()) {
+        repeat(20) { index ->
+            val xPos = remember { (10..90).random() / 100f }
+            val delay = remember { (0..2000).random() }
+            
+            val yPos by infiniteTransition.animateFloat(
+                initialValue = -0.1f,
+                targetValue = 1.1f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(durationMillis = 2500, delayMillis = delay, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart
+                ),
+                label = "confettiY"
+            )
+
+            val rotation by infiniteTransition.animateFloat(
+                initialValue = 0f,
+                targetValue = 360f,
+                animationSpec = infiniteRepeatable(
+                    animation = tween(1000, easing = LinearEasing)
+                ),
+                label = "confettiRotation"
+            )
+
+            val color = remember { listOf(PrimaryCyan, AccentGold, Color.Red, Color.Yellow, Color.Green).random() }
+
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(0.03f)
+                    .align(Alignment.TopStart)
+                    .graphicsLayer {
+                        translationX = xPos * 1000f // Rough estimation
+                        translationY = yPos * 2000f
+                        rotationZ = rotation
+                    }
+                    .background(color, RoundedCornerShape(2.dp))
+            )
         }
     }
 }
@@ -149,6 +199,12 @@ fun RewardContent(
             ) {
                 InfoBadge(stringResource(state.difficulty.resId), MaterialTheme.colorScheme.primary)
                 InfoBadge(formatTime(state.timerSeconds), MaterialTheme.colorScheme.secondary)
+                
+                // Cells Per Minute (CPM)
+                val cluesCount = state.puzzle.cells.flatten().count { it.isClue }
+                val filledCount = 81 - cluesCount
+                val cpm = if (state.timerSeconds > 0) (filledCount.toFloat() / (state.timerSeconds.toFloat() / 60f)).toInt() else 0
+                InfoBadge("$cpm CPM", AccentGold)
             }
             
             Spacer(modifier = Modifier.height(24.dp))
@@ -239,6 +295,19 @@ fun InfoBadge(text: String, color: Color) {
 
 @Composable
 fun RewardCard(value: String, label: String, icon: ImageVector, color: Color) {
+    var animatedValue by remember { mutableIntStateOf(0) }
+    val target = value.filter { it.isDigit() }.toIntOrNull() ?: 0
+    
+    LaunchedEffect(Unit) {
+        delay(500)
+        val duration = 1000
+        val steps = 20
+        for (i in 1..steps) {
+            delay((duration / steps).toLong())
+            animatedValue = (target * (i.toFloat() / steps)).toInt()
+        }
+    }
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -247,7 +316,12 @@ fun RewardCard(value: String, label: String, icon: ImageVector, color: Color) {
             .widthIn(min = 80.dp)
     ) {
         Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
-        Text(value, fontWeight = FontWeight.ExtraBold, fontSize = 18.sp, color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            if (target > 0) "+$animatedValue" else value, 
+            fontWeight = FontWeight.ExtraBold, 
+            fontSize = 18.sp, 
+            color = MaterialTheme.colorScheme.onSurface
+        )
         Text(label, fontSize = 10.sp, color = TextMuted)
     }
 }

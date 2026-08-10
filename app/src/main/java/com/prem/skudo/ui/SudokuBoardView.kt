@@ -17,6 +17,7 @@ import com.prem.skudo.ui.theme.BoxBorder
 fun SudokuBoardView(
     board: SudokuBoard,
     onCellClick: (Int, Int) -> Unit,
+    onCellLongClick: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
     boardStyle: String = "Modern",
 ) {
@@ -56,6 +57,7 @@ fun SudokuBoardView(
                                             SudokuCellView(
                                                 cell = board[actualRow, actualCol],
                                                 onClick = { onCellClick(actualRow, actualCol) },
+                                                onLongClick = { onCellLongClick(actualRow, actualCol) },
                                                 modifier = Modifier.weight(1f),
                                                 boardStyle = boardStyle
                                             )

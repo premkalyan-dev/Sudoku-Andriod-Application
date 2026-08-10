@@ -1,12 +1,9 @@
 package com.prem.skudo.ui
 
 import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.*
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.*
@@ -27,10 +24,12 @@ import androidx.compose.ui.unit.sp
 import com.prem.skudo.model.SudokuCell
 import com.prem.skudo.ui.theme.*
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun SudokuCellView(
     cell: SudokuCell,
     onClick: () -> Unit,
+    onLongClick: () -> Unit,
     modifier: Modifier = Modifier,
     boardStyle: String = "Modern",
 ) {
@@ -64,22 +63,33 @@ fun SudokuCellView(
 
     // 2. Tactile Scale Feedback
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else if (cell.isAnimatingCompletion) 1.1f else 1f,
+        targetValue = if (isPressed) 0.88f else if (cell.isAnimatingCompletion) 1.05f else 1f,
         animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessMedium
+            dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioHighBouncy,
+            stiffness = if (isPressed) Spring.StiffnessMedium else Spring.StiffnessLow
         ),
         label = "cellScale"
     )
 
-    // 3. Number "Entrance" Pop
+    // 3. Number "Entrance" Pop & Shake
     var lastValue by remember { mutableStateOf(cell.value) }
     val valuePop = remember { androidx.compose.animation.core.Animatable(1f) }
+    val shakeOffset = remember { androidx.compose.animation.core.Animatable(0f) }
 
     LaunchedEffect(cell.value) {
-        if ((cell.value != lastValue) && (cell.value != null)) {
-            valuePop.snapTo(0.7f)
-            valuePop.animateTo(1f, spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium))
+        if (cell.value != lastValue && cell.value != null) {
+            if (cell.isValid) {
+                // Pop for correct/neutral
+                valuePop.snapTo(0.5f)
+                valuePop.animateTo(1f, spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium))
+            } else {
+                // Shake for wrong
+                repeat(3) {
+                    shakeOffset.animateTo(6f, tween(40, easing = LinearEasing))
+                    shakeOffset.animateTo(-6f, tween(40, easing = LinearEasing))
+                }
+                shakeOffset.animateTo(0f, spring(Spring.DampingRatioMediumBouncy))
+            }
         }
         lastValue = cell.value
     }
@@ -92,6 +102,7 @@ fun SudokuCellView(
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
+                translationX = shakeOffset.value
             }
             .clip(cellShape)
             .background(backgroundColor)
@@ -99,10 +110,11 @@ fun SudokuCellView(
                 width = 0.5.dp,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
             )
-            .clickable(
+            .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null, // Custom ripple or no ripple for premium feel
-                onClick = onClick
+                indication = null,
+                onClick = onClick,
+                onLongClick = onLongClick
             ),
         contentAlignment = Alignment.Center
     ) {

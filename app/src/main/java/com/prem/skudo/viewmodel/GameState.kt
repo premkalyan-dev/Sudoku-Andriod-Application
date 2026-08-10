@@ -8,6 +8,7 @@ data class GameState(
     val solution: SudokuBoard = SudokuBoard(),
     val difficulty: Difficulty = Difficulty.EASY,
     val selectedCell: Pair<Int, Int>? = null,
+    val selectedNumber: Int? = null,
     val isGameOver: Boolean = false,
     val isLoading: Boolean = false,
     

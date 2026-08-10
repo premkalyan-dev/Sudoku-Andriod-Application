@@ -190,11 +190,49 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun selectCell(row: Int, col: Int) {
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
-        _uiState.update { 
-            val newState = it.copy(selectedCell = row to col)
-            updateHighlights(newState)
+
+        val currentState = _uiState.value
+        if (currentState.selectedNumber != null) {
+            // Digit-First Input: Apply selected number to this cell
+            _uiState.update { it.copy(selectedCell = row to col) }
+            enterNumber(currentState.selectedNumber)
+        } else {
+            // Cell-First Input: Just select the cell
+            _uiState.update { 
+                val newState = it.copy(selectedCell = row to col)
+                updateHighlights(newState)
+            }
         }
         autoSave()
+    }
+
+    fun selectNumber(num: Int) {
+        if (_uiState.value.isPaused || _uiState.value.isGameOver) return
+        val currentState = _uiState.value
+        if (currentState.selectedCell != null) {
+            // Cell-First: If a cell is selected, fill it
+            enterNumber(num)
+        } else {
+            // Digit-First: Just select the number for subsequent taps
+            _uiState.update { 
+                val newNum = if (it.selectedNumber == num) null else num
+                it.copy(selectedNumber = newNum) 
+            }
+            hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
+        }
+    }
+
+    fun onCellLongClick(row: Int, col: Int) {
+        if (_uiState.value.isPaused || _uiState.value.isGameOver) return
+        val activeNum = _uiState.value.selectedNumber
+        if (activeNum != null) {
+            // Long press in digit-first mode: Enter as note
+            updateNotes(row, col, activeNum)
+            hapticManager.vibrate(com.prem.skudo.utils.HapticType.MEDIUM)
+        } else {
+            // Otherwise, just select (or could toggle notes mode)
+            selectCell(row, col)
+        }
     }
 
     fun toggleNotesMode() {
@@ -203,6 +241,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun enterNumber(num: Int) {
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
+
+        // Update selected number so the pad highlights it
+        _uiState.update { it.copy(selectedNumber = num) }
+
         val (row, col) = _uiState.value.selectedCell ?: return
         val currentCell = _uiState.value.puzzle[row, col]
 
