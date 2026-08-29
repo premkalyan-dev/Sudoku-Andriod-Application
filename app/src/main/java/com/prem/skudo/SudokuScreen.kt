@@ -188,13 +188,17 @@ fun SudokuScreenContent(
         ) {
             // 1. Premium Header (Compact & Elegant)
             PremiumGameHeader(
-                uiState = uiState,
+                timerSeconds = uiState.timerSeconds,
                 onBack = { onPause() },
                 onPauseToggle = onPause
             )
 
             // 2. Main Stats Bar (Difficulty & Mistakes)
-            GameStatsBar(uiState = uiState)
+            GameStatsBar(
+                difficulty = uiState.difficulty,
+                mistakes = uiState.mistakes,
+                maxMistakes = uiState.maxMistakes
+            )
 
             // 3. Sudoku Board (The Hero)
             Box(
@@ -216,7 +220,8 @@ fun SudokuScreenContent(
 
             // 4. Compact Control Actions
             ActionButtonsRow(
-                uiState = uiState,
+                isNotesMode = uiState.isNotesMode,
+                hintsRemaining = uiState.hintsRemaining,
                 onUndo = onUndo,
                 onErase = onErase,
                 onToggleNotes = onToggleNotes,
@@ -263,7 +268,7 @@ fun SudokuScreenContent(
 
 @Composable
 fun PremiumGameHeader(
-    uiState: GameState,
+    timerSeconds: Long,
     onBack: () -> Unit,
     onPauseToggle: () -> Unit
 ) {
@@ -303,7 +308,7 @@ fun PremiumGameHeader(
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
-                    text = formatTime(uiState.timerSeconds),
+                    text = formatTime(timerSeconds),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Black,
                     fontFamily = FontFamily.Monospace,
@@ -325,7 +330,11 @@ fun PremiumGameHeader(
 }
 
 @Composable
-fun GameStatsBar(uiState: GameState) {
+fun GameStatsBar(
+    difficulty: Difficulty,
+    mistakes: Int,
+    maxMistakes: Int
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -339,7 +348,7 @@ fun GameStatsBar(uiState: GameState) {
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = stringResource(uiState.difficulty.resId).uppercase(),
+                text = stringResource(difficulty.resId).uppercase(),
                 modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                 style = MaterialTheme.typography.labelMedium,
                 fontWeight = FontWeight.Black,
@@ -356,8 +365,8 @@ fun GameStatsBar(uiState: GameState) {
                 fontWeight = FontWeight.ExtraBold,
                 color = TextMuted
             )
-            repeat(uiState.maxMistakes) { index ->
-                val isLost = index < uiState.mistakes
+            repeat(maxMistakes) { index ->
+                val isLost = index < mistakes
                 Icon(
                     imageVector = if (isLost) Icons.Default.Close else Icons.Default.Favorite,
                     contentDescription = null,
@@ -373,7 +382,8 @@ fun GameStatsBar(uiState: GameState) {
 
 @Composable
 fun ActionButtonsRow(
-    uiState: GameState,
+    isNotesMode: Boolean,
+    hintsRemaining: Int,
     onUndo: () -> Unit,
     onErase: () -> Unit,
     onToggleNotes: () -> Unit,
@@ -395,16 +405,16 @@ fun ActionButtonsRow(
             CompactActionButton(Icons.AutoMirrored.Filled.Undo, stringResource(R.string.undo), onUndo)
             CompactActionButton(Icons.Default.Delete, stringResource(R.string.erase), onErase)
             CompactActionButton(
-                icon = if (uiState.isNotesMode) Icons.Default.Edit else Icons.Outlined.Edit,
+                icon = if (isNotesMode) Icons.Default.Edit else Icons.Outlined.Edit,
                 label = stringResource(R.string.notes),
                 onClick = onToggleNotes,
-                active = uiState.isNotesMode
+                active = isNotesMode
             )
             CompactActionButton(
                 icon = Icons.Default.Lightbulb,
                 label = stringResource(R.string.hint),
                 onClick = onHint,
-                badge = if (uiState.hintsRemaining > 0) uiState.hintsRemaining.toString() else null
+                badge = if (hintsRemaining > 0) hintsRemaining.toString() else null
             )
         }
     }
@@ -432,17 +442,19 @@ fun PremiumNumberPad(
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         (1..9).forEach { num ->
-            val count = counts[num]
-            val isCompleted = count >= 9
-            
-            PremiumNumberKey(
-                num = num,
-                remaining = 9 - count,
-                isCompleted = isCompleted,
-                isSelected = selectedNumber == num,
-                modifier = Modifier.weight(1f),
-                onClick = { if (!isCompleted) onNumberClick(num) }
-            )
+            key(num) {
+                val count = counts[num]
+                val isCompleted = count >= 9
+                
+                PremiumNumberKey(
+                    num = num,
+                    remaining = 9 - count,
+                    isCompleted = isCompleted,
+                    isSelected = selectedNumber == num,
+                    modifier = Modifier.weight(1f),
+                    onClick = { if (!isCompleted) onNumberClick(num) }
+                )
+            }
         }
     }
 }

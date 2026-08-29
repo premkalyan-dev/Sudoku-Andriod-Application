@@ -1,5 +1,8 @@
 package com.prem.skudo.model
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class SudokuCell(
     val row: Int,
     val col: Int,

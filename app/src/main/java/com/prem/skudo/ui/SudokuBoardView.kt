@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
@@ -68,13 +69,15 @@ fun SudokuBoardView(
                                         for (col in 0 until 3) {
                                             val actualRow = (rowGroup * 3) + row
                                             val actualCol = (colGroup * 3) + col
-                                            SudokuCellView(
-                                                cell = board[actualRow, actualCol],
-                                                onClick = { onCellClick(actualRow, actualCol) },
-                                                onLongClick = { onCellLongClick(actualRow, actualCol) },
-                                                modifier = Modifier.weight(1f),
-                                                boardStyle = boardStyle
-                                            )
+                                            key("${actualRow}_${actualCol}") {
+                                                SudokuCellView(
+                                                    cell = board[actualRow, actualCol],
+                                                    onClick = { onCellClick(actualRow, actualCol) },
+                                                    onLongClick = { onCellLongClick(actualRow, actualCol) },
+                                                    modifier = Modifier.weight(1f),
+                                                    boardStyle = boardStyle
+                                                )
+                                            }
                                         }
                                     }
                                 }

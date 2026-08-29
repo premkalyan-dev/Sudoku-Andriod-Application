@@ -465,7 +465,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             rowList.mapIndexed { ci, cell ->
                 val value = cell.value
                 val isValid = if (!state.autoCheck || value == null) true else value == solution[ri, ci].value
-                cell.copy(isValid = isValid)
+                if (cell.isValid == isValid) cell else cell.copy(isValid = isValid)
             }
         }
         val updatedState = state.copy(puzzle = SudokuBoard(newCells))
@@ -478,11 +478,21 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
         val newCells = state.puzzle.cells.mapIndexed { ri, rowList ->
             rowList.mapIndexed { ci, cell ->
-                cell.copy(
-                    isHighlighted = ri == selR && ci == selC,
-                    isRelated = state.highlightRelated && (ri == selR || ci == selC || (ri / 3 == selR / 3 && ci / 3 == selC / 3)),
-                    isMatchingNumber = state.highlightIdentical && selectedValue != null && cell.value == selectedValue
-                )
+                val newHighlighted = ri == selR && ci == selC
+                val newRelated = state.highlightRelated && (ri == selR || ci == selC || (ri / 3 == selR / 3 && ci / 3 == selC / 3))
+                val newMatching = state.highlightIdentical && selectedValue != null && cell.value == selectedValue
+
+                if (cell.isHighlighted == newHighlighted && 
+                    cell.isRelated == newRelated && 
+                    cell.isMatchingNumber == newMatching) {
+                    cell
+                } else {
+                    cell.copy(
+                        isHighlighted = newHighlighted,
+                        isRelated = newRelated,
+                        isMatchingNumber = newMatching
+                    )
+                }
             }
         }
         return state.copy(puzzle = SudokuBoard(newCells))

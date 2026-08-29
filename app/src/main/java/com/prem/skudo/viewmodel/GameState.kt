@@ -1,8 +1,10 @@
 package com.prem.skudo.viewmodel
 
+import androidx.compose.runtime.Immutable
 import com.prem.skudo.model.Difficulty
 import com.prem.skudo.model.SudokuBoard
 
+@Immutable
 data class GameState(
     val puzzle: SudokuBoard = SudokuBoard(),
     val solution: SudokuBoard = SudokuBoard(),

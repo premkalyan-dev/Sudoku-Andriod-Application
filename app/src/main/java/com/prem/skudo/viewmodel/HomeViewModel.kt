@@ -17,12 +17,14 @@ import com.prem.skudo.repository.CloudSyncRepository
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import androidx.compose.runtime.Immutable
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 
+@Immutable
 data class HomeState(
     val easyStats: GameStats? = null,
     val mediumStats: GameStats? = null,
