@@ -1,14 +1,14 @@
 package com.prem.skudo.ui
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.*
@@ -17,6 +17,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -48,18 +49,24 @@ fun ShopScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Coin Shop", fontWeight = FontWeight.Bold) },
+                title = { 
+                    Text(
+                        text = "Coin Shop", 
+                        fontWeight = FontWeight.ExtraBold,
+                        style = MaterialTheme.typography.titleLarge
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, null)
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
                 actions = {
                     CurrencyBadge(uiState.hints.toLong(), Icons.Default.Lightbulb, EasyGreen)
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     CurrencyBadge(uiState.coins, Icons.Default.MonetizationOn, AccentGold)
-                    Spacer(modifier = Modifier.width(8.dp))
-                    CurrencyBadge(uiState.gems, Icons.Default.Diamond, Color(0xFF00CED1))
+                    Spacer(modifier = Modifier.width(6.dp))
+                    CurrencyBadge(uiState.gems, Icons.Default.Diamond, GemCyan)
                     Spacer(modifier = Modifier.width(16.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -75,16 +82,16 @@ fun ShopScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 16.dp, vertical = 12.dp)
         ) {
-            Text(
-                "Buy Hints",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+            // Section 1: Buy Hints
+            SectionHeader(
+                title = "Buy Hints",
+                subtitle = "Power-ups to assist your puzzle solving"
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             
             val hintPackages = listOf(
                 Triple(5, 200, Icons.Default.Lightbulb),
@@ -93,8 +100,9 @@ fun ShopScreen(
                 Triple(60, 1500, Icons.Default.Psychology)
             )
             
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            // 2x2 Grid via Columns of Rows (safe with outer verticalScroll)
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     HintShopItemCard(
                         hintsCount = hintPackages[0].first,
                         price = hintPackages[0].second,
@@ -110,7 +118,7 @@ fun ShopScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     HintShopItemCard(
                         hintsCount = hintPackages[2].first,
                         price = hintPackages[2].second,
@@ -128,21 +136,21 @@ fun ShopScreen(
                 }
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(28.dp))
             
-            Text(
-                "Game Themes",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+            // Section 2: Game Themes
+            SectionHeader(
+                title = "Game Themes",
+                subtitle = "Personalize your board styling & colors"
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             
             val themes = listOf("Ocean", "Forest", "Neon", "Gold")
             
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+            // 2x2 Grid via Columns of Rows (safe with outer verticalScroll)
+            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     ShopItemCard(
                         title = themes[0],
                         price = 1000,
@@ -158,7 +166,7 @@ fun ShopScreen(
                         modifier = Modifier.weight(1f)
                     )
                 }
-                Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
                     ShopItemCard(
                         title = themes[2],
                         price = 1000,
@@ -175,28 +183,62 @@ fun ShopScreen(
                     )
                 }
             }
+
+            Spacer(modifier = Modifier.height(24.dp))
         }
+    }
+}
+
+@Composable
+fun SectionHeader(title: String, subtitle: String) {
+    Column {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
+            fontWeight = FontWeight.ExtraBold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(modifier = Modifier.height(2.dp))
+        Text(
+            text = subtitle,
+            style = MaterialTheme.typography.bodySmall,
+            color = TextMuted
+        )
     }
 }
 
 @Composable
 fun CurrencyBadge(amount: Long, icon: ImageVector, color: Color) {
     Surface(
-        color = color.copy(alpha = 0.1f),
-        shape = RoundedCornerShape(16.dp),
-        border = androidx.compose.foundation.BorderStroke(1.dp, color.copy(alpha = 0.3f))
+        color = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(20.dp),
+        shadowElevation = 2.dp,
+        border = BorderStroke(1.dp, color.copy(alpha = 0.25f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(icon, null, tint = color, modifier = Modifier.size(16.dp))
-            Spacer(modifier = Modifier.width(4.dp))
+            Box(
+                modifier = Modifier
+                    .size(20.dp)
+                    .clip(CircleShape)
+                    .background(color.copy(alpha = 0.15f)),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = color,
+                    modifier = Modifier.size(13.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
-                amount.toString(),
+                text = amount.toString(),
                 fontWeight = FontWeight.Bold,
                 fontSize = 12.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = MaterialTheme.colorScheme.onSurface
             )
         }
     }
@@ -213,34 +255,71 @@ fun HintShopItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
             .clickable { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp, pressedElevation = 6.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 18.dp, horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Glowing circular icon badge
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(EasyGreen.copy(alpha = 0.1f)),
+                    .size(58.dp)
+                    .shadow(4.dp, CircleShape, spotColor = EasyGreen.copy(alpha = 0.4f))
+                    .background(EasyGreen.copy(alpha = 0.14f), CircleShape)
+                    .border(1.5.dp, EasyGreen.copy(alpha = 0.35f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, null, tint = EasyGreen, modifier = Modifier.size(32.dp))
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = EasyGreen,
+                    modifier = Modifier.size(28.dp)
+                )
             }
-            
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = "$hintsCount Hints",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
-            
-            Text("$hintsCount Hints", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.MonetizationOn, null, tint = AccentGold, modifier = Modifier.size(14.dp))
-                Spacer(modifier = Modifier.width(4.dp))
-                Text(price.toString(), fontWeight = FontWeight.Bold, color = AccentGold)
+
+            // Price CTA Pill
+            Surface(
+                color = AccentGold.copy(alpha = 0.15f),
+                shape = RoundedCornerShape(12.dp),
+                border = BorderStroke(1.dp, AccentGold.copy(alpha = 0.45f))
+            ) {
+                Row(
+                    modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.MonetizationOn,
+                        contentDescription = null,
+                        tint = AccentGold,
+                        modifier = Modifier.size(15.dp)
+                    )
+                    Spacer(modifier = Modifier.width(5.dp))
+                    Text(
+                        text = price.toString(),
+                        fontWeight = FontWeight.ExtraBold,
+                        fontSize = 13.sp,
+                        color = AccentGold
+                    )
+                }
             }
         }
     }
@@ -254,46 +333,109 @@ fun ShopItemCard(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val cardColor = if (isUnlocked) {
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+    } else {
+        MaterialTheme.colorScheme.surface
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
             .clickable(enabled = !isUnlocked) { onClick() },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isUnlocked) MaterialTheme.colorScheme.surfaceVariant else MaterialTheme.colorScheme.surface
+        shape = RoundedCornerShape(20.dp),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = if (isUnlocked) 1.dp else 3.dp,
+            pressedElevation = 6.dp
+        ),
+        colors = CardDefaults.cardColors(containerColor = cardColor),
+        border = BorderStroke(
+            1.dp,
+            if (isUnlocked) EasyGreen.copy(alpha = 0.3f)
+            else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
         )
     ) {
         Column(
-            modifier = Modifier.padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 18.dp, horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            val badgeColor = if (isUnlocked) EasyGreen else MaterialTheme.colorScheme.primary
+            
+            // Icon Badge
             Box(
                 modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)),
+                    .size(58.dp)
+                    .shadow(4.dp, CircleShape, spotColor = badgeColor.copy(alpha = 0.35f))
+                    .background(badgeColor.copy(alpha = 0.14f), CircleShape)
+                    .border(1.5.dp, badgeColor.copy(alpha = 0.35f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    if (isUnlocked) Icons.Default.Check else Icons.Default.Lock,
-                    null,
-                    tint = if (isUnlocked) EasyGreen else MaterialTheme.colorScheme.primary
+                    imageVector = if (isUnlocked) Icons.Default.Check else Icons.Default.Lock,
+                    contentDescription = null,
+                    tint = badgeColor,
+                    modifier = Modifier.size(26.dp)
                 )
             }
-            
+
+            Spacer(modifier = Modifier.height(14.dp))
+
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
             Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
+
+            // Bottom CTA: Price Chip vs Unlocked Badge
             if (isUnlocked) {
-                Text("UNLOCKED", color = EasyGreen, fontWeight = FontWeight.ExtraBold, fontSize = 10.sp)
+                Surface(
+                    color = EasyGreen.copy(alpha = 0.16f),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, EasyGreen.copy(alpha = 0.4f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "UNLOCKED",
+                            color = EasyGreen,
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 11.sp,
+                            letterSpacing = 0.5.sp
+                        )
+                    }
+                }
             } else {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.MonetizationOn, null, tint = AccentGold, modifier = Modifier.size(14.dp))
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(price.toString(), fontWeight = FontWeight.Bold, color = AccentGold)
+                Surface(
+                    color = AccentGold.copy(alpha = 0.15f),
+                    shape = RoundedCornerShape(12.dp),
+                    border = BorderStroke(1.dp, AccentGold.copy(alpha = 0.45f))
+                ) {
+                    Row(
+                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.MonetizationOn,
+                            contentDescription = null,
+                            tint = AccentGold,
+                            modifier = Modifier.size(15.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = price.toString(),
+                            fontWeight = FontWeight.ExtraBold,
+                            fontSize = 13.sp,
+                            color = AccentGold
+                        )
+                    }
                 }
             }
         }
