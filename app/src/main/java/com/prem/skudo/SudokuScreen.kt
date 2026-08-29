@@ -147,12 +147,6 @@ fun SudokuScreenContent(
     onContinueWithGems: () -> Unit,
     onGameOver: () -> Unit
 ) {
-    var contentVisible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(50)
-        contentVisible = true
-    }
-
     // Intercept back press to show Pause Menu instead of quitting
     BackHandler {
         onPause()
@@ -193,76 +187,51 @@ fun SudokuScreenContent(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // 1. Premium Header (Compact & Elegant)
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = slideInVertically { -it } + fadeIn()
-            ) {
-                PremiumGameHeader(
-                    uiState = uiState,
-                    onBack = { onPause() },
-                    onPauseToggle = onPause
-                )
-            }
+            PremiumGameHeader(
+                uiState = uiState,
+                onBack = { onPause() },
+                onPauseToggle = onPause
+            )
 
             // 2. Main Stats Bar (Difficulty & Mistakes)
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn(animationSpec = tween(600, delayMillis = 200))
-            ) {
-                GameStatsBar(uiState = uiState)
-            }
+            GameStatsBar(uiState = uiState)
 
             // 3. Sudoku Board (The Hero)
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = scaleIn(initialScale = 0.9f, animationSpec = spring(Spring.DampingRatioMediumBouncy)) + fadeIn(animationSpec = tween(400, delayMillis = 100))
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                contentAlignment = Alignment.Center
             ) {
-                Box(
+                SudokuBoardView(
+                    board = uiState.puzzle,
+                    onCellClick = onCellClick,
+                    onCellLongClick = onCellLongClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    SudokuBoardView(
-                        board = uiState.puzzle,
-                        onCellClick = onCellClick,
-                        onCellLongClick = onCellLongClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .aspectRatio(1f),
-                        boardStyle = uiState.boardStyle
-                    )
-                }
+                        .aspectRatio(1f),
+                    boardStyle = uiState.boardStyle
+                )
             }
 
             // 4. Compact Control Actions
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = fadeIn(animationSpec = tween(400, delayMillis = 300))
-            ) {
-                ActionButtonsRow(
-                    uiState = uiState,
-                    onUndo = onUndo,
-                    onErase = onErase,
-                    onToggleNotes = onToggleNotes,
-                    onHint = onHint
-                )
-            }
+            ActionButtonsRow(
+                uiState = uiState,
+                onUndo = onUndo,
+                onErase = onErase,
+                onToggleNotes = onToggleNotes,
+                onHint = onHint
+            )
 
             Spacer(modifier = Modifier.height(4.dp))
 
             // 5. Premium Number Pad
-            AnimatedVisibility(
-                visible = contentVisible,
-                enter = slideInVertically { it } + fadeIn(animationSpec = tween(400, delayMillis = 400))
-            ) {
-                PremiumNumberPad(
-                    board = uiState.puzzle,
-                    selectedNumber = uiState.selectedNumber,
-                    onNumberClick = onNumberClick,
-                    isNotesMode = uiState.isNotesMode
-                )
-            }
+            PremiumNumberPad(
+                board = uiState.puzzle,
+                selectedNumber = uiState.selectedNumber,
+                onNumberClick = onNumberClick,
+                isNotesMode = uiState.isNotesMode
+            )
 
             Spacer(modifier = Modifier.height(12.dp))
         }

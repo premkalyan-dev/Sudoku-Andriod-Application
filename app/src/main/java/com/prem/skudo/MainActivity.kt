@@ -24,6 +24,10 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.*
 import androidx.compose.ui.platform.LocalContext
@@ -76,8 +80,39 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    NavHost(navController = navController, startDestination = "splash") {
-                        composable("splash") {
+                    NavHost(
+                        navController = navController,
+                        startDestination = "splash",
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(220, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(220))
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                                animationSpec = tween(180, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(180))
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(220, easing = FastOutSlowInEasing)
+                            ) + fadeIn(animationSpec = tween(220))
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.End,
+                                animationSpec = tween(180, easing = FastOutSlowInEasing)
+                            ) + fadeOut(animationSpec = tween(180))
+                        }
+                    ) {
+                        composable(
+                            "splash",
+                            enterTransition = { fadeIn(tween(150)) },
+                            exitTransition = { fadeOut(tween(150)) }
+                        ) {
                             LoadingScreen(
                                 onLoadingComplete = {
                                     navController.navigate("home") {

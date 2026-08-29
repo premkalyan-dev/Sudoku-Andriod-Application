@@ -3,57 +3,49 @@ package com.prem.skudo.domain
 class SudokuSolver(private val validator: SudokuValidator = SudokuValidator()) {
     
     fun solve(board: Array<IntArray>): Boolean {
-        for (row in 0..8) {
-            for (col in 0..8) {
-                if (board[row][col] == 0) {
-                    for (num in 1..9) {
-                        if (validator.isValid(board, row, col, num)) {
-                            board[row][col] = num
-                            if (solve(board)) return true
-                            board[row][col] = 0
-                        }
-                    }
-                    return false
-                }
+        return solveFrom(board, 0)
+    }
+
+    private fun solveFrom(board: Array<IntArray>, index: Int): Boolean {
+        if (index >= 81) return true
+        val row = index / 9
+        val col = index % 9
+        if (board[row][col] != 0) {
+            return solveFrom(board, index + 1)
+        }
+        for (num in 1..9) {
+            if (validator.isValid(board, row, col, num)) {
+                board[row][col] = num
+                if (solveFrom(board, index + 1)) return true
+                board[row][col] = 0
             }
         }
-        return true
+        return false
     }
 
     fun countSolutions(board: Array<IntArray>, limit: Int = 2): Int {
         var count = 0
-        fun solveInternal() {
+        fun solveInternal(index: Int) {
             if (count >= limit) return
-            
-            var row = -1
-            var col = -1
-            var empty = true
-            for (i in 0..8) {
-                for (j in 0..8) {
-                    if (board[i][j] == 0) {
-                        row = i
-                        col = j
-                        empty = false
-                        break
-                    }
-                }
-                if (!empty) break
-            }
-
-            if (empty) {
+            if (index >= 81) {
                 count++
                 return
             }
-
+            val row = index / 9
+            val col = index % 9
+            if (board[row][col] != 0) {
+                solveInternal(index + 1)
+                return
+            }
             for (num in 1..9) {
                 if (validator.isValid(board, row, col, num)) {
                     board[row][col] = num
-                    solveInternal()
+                    solveInternal(index + 1)
                     board[row][col] = 0
                 }
             }
         }
-        solveInternal()
+        solveInternal(0)
         return count
     }
 }
