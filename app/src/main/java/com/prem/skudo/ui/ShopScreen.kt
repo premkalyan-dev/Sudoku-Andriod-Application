@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,7 +63,9 @@ fun ShopScreen(
                     Text(
                         text = "Coin Shop", 
                         fontWeight = FontWeight.ExtraBold,
-                        style = MaterialTheme.typography.titleLarge
+                        fontSize = 18.sp,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     ) 
                 },
                 navigationIcon = {
@@ -72,11 +75,11 @@ fun ShopScreen(
                 },
                 actions = {
                     CurrencyBadge(uiState.hints.toLong(), Icons.Default.Lightbulb, EasyGreen)
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     CurrencyBadge(uiState.coins, Icons.Default.MonetizationOn, AccentGold)
-                    Spacer(modifier = Modifier.width(6.dp))
+                    Spacer(modifier = Modifier.width(4.dp))
                     CurrencyBadge(uiState.gems, Icons.Default.Diamond, GemCyan)
-                    Spacer(modifier = Modifier.width(16.dp))
+                    Spacer(modifier = Modifier.width(8.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background,
@@ -229,7 +232,8 @@ fun HintPackCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = if (pack.isBestValue) 10.dp else 0.dp),
+                .padding(top = if (pack.isBestValue) 10.dp else 0.dp)
+                .clip(RoundedCornerShape(20.dp)),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
                 containerColor = if (pack.isBestValue) {
@@ -405,17 +409,17 @@ fun SectionHeader(title: String, subtitle: String) {
 fun CurrencyBadge(amount: Long, icon: ImageVector, color: Color) {
     Surface(
         color = MaterialTheme.colorScheme.surface,
-        shape = RoundedCornerShape(20.dp),
-        shadowElevation = 2.dp,
+        shape = RoundedCornerShape(16.dp),
+        shadowElevation = 1.5.dp,
         border = BorderStroke(1.dp, color.copy(alpha = 0.25f))
     ) {
         Row(
-            modifier = Modifier.padding(horizontal = 10.dp, vertical = 5.dp),
+            modifier = Modifier.padding(horizontal = 7.dp, vertical = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(20.dp)
+                    .size(18.dp)
                     .clip(CircleShape)
                     .background(color.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
@@ -424,14 +428,14 @@ fun CurrencyBadge(amount: Long, icon: ImageVector, color: Color) {
                     imageVector = icon,
                     contentDescription = null,
                     tint = color,
-                    modifier = Modifier.size(13.dp)
+                    modifier = Modifier.size(11.dp)
                 )
             }
-            Spacer(modifier = Modifier.width(6.dp))
+            Spacer(modifier = Modifier.width(4.dp))
             Text(
                 text = amount.toString(),
                 fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
         }
@@ -447,7 +451,7 @@ fun ShopItemCard(
     modifier: Modifier = Modifier
 ) {
     val cardColor = if (isUnlocked) {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.45f)
+        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
     } else {
         MaterialTheme.colorScheme.surface
     }
