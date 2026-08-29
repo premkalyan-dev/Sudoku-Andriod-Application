@@ -121,7 +121,29 @@ class MainActivity : ComponentActivity() {
                                 }
                             )
                         }
-                        composable("home") {
+                        composable(
+                            "home",
+                            exitTransition = {
+                                if (targetState.destination.route == "shop") {
+                                    fadeOut(animationSpec = tween(250))
+                                } else {
+                                    slideOutOfContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.Start,
+                                        animationSpec = tween(180, easing = FastOutSlowInEasing)
+                                    ) + fadeOut(animationSpec = tween(180))
+                                }
+                            },
+                            popEnterTransition = {
+                                if (initialState.destination.route == "shop") {
+                                    fadeIn(animationSpec = tween(250))
+                                } else {
+                                    slideIntoContainer(
+                                        towards = AnimatedContentTransitionScope.SlideDirection.End,
+                                        animationSpec = tween(220, easing = FastOutSlowInEasing)
+                                    ) + fadeIn(animationSpec = tween(220))
+                                }
+                            }
+                        ) {
                             val homeState by homeViewModel.uiState.collectAsState()
                             
                             if (homeState.userProfile?.level == 1 && homeState.userProfile?.xp == 0L) {
@@ -164,7 +186,30 @@ class MainActivity : ComponentActivity() {
                                 onViewProfile = { navController.navigate("profile") }
                             )
                         }
-                        composable("shop") {
+                        composable(
+                            "shop",
+                            enterTransition = {
+                                slideIntoContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
+                                ) + fadeIn(animationSpec = tween(300))
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                                ) + fadeOut(animationSpec = tween(250))
+                            },
+                            popEnterTransition = {
+                                fadeIn(animationSpec = tween(250))
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                                ) + fadeOut(animationSpec = tween(250))
+                            }
+                        ) {
                             ShopScreen(onBack = { navController.popBackStack() })
                         }
                         composable(
