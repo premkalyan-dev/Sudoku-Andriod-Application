@@ -343,14 +343,11 @@ data class OnboardingData(
 
 @Composable
 fun LoadingScreen(onLoadingComplete: () -> Unit) {
-    val context = LocalContext.current
-    val soundManager = remember { com.prem.skudo.utils.SoundManager(context) }
     val scale = remember { Animatable(0.6f) }
     val alpha = remember { Animatable(0f) }
     val textAlpha = remember { Animatable(0f) }
 
     LaunchedEffect(Unit) {
-        soundManager.playSound("startup")
         // Logo animation: bounce scale and fade in
         launch {
             scale.animateTo(

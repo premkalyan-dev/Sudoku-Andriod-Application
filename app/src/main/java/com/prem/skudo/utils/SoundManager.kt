@@ -49,7 +49,6 @@ class SoundManager(private val context: Context) {
         if (!isEnabled) return
         
         when (name) {
-            "startup" -> playBrandedStartup()
             "victory" -> playVictoryFanfare()
             "completion" -> playCompletionChime()
             "mistake" -> playMistakeTone()
@@ -59,18 +58,6 @@ class SoundManager(private val context: Context) {
                     soundPool.play(id, 1.0f, 1.0f, 0, 0, 1.0f)
                 }
             }
-        }
-    }
-
-    private fun playBrandedStartup() {
-        if (!isEnabled) return
-        CoroutineScope(Dispatchers.Default).launch {
-            // A clean, ascending "Brand Reveal" chord
-            toneGenerator.startTone(ToneGenerator.TONE_DTMF_1, 100)
-            delay(150)
-            toneGenerator.startTone(ToneGenerator.TONE_DTMF_5, 100)
-            delay(150)
-            toneGenerator.startTone(ToneGenerator.TONE_DTMF_9, 200)
         }
     }
 
