@@ -7,11 +7,10 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.prem.skudo.model.SudokuBoard
-import com.prem.skudo.ui.theme.BoxBorder
 
 @Composable
 fun SudokuBoardView(
@@ -21,34 +20,49 @@ fun SudokuBoardView(
     modifier: Modifier = Modifier,
     boardStyle: String = "Modern",
 ) {
-    val heavyBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-    val boardShape = RoundedCornerShape(12.dp)
+    val blockBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.22f)
+    val outerBorderColor = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+    val boardShape = RoundedCornerShape(18.dp)
+    val blockShape = RoundedCornerShape(8.dp)
 
     Box(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .shadow(16.dp, boardShape, spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f))
-            .background(MaterialTheme.colorScheme.surface, boardShape)
-            .border(2.dp, heavyBorderColor, boardShape)
-            .padding(2.dp)
+            .shadow(
+                elevation = 10.dp,
+                shape = boardShape,
+                spotColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.25f),
+                ambientColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+            )
+            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f), boardShape)
+            .border(1.5.dp, outerBorderColor, boardShape)
+            .padding(4.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             for (rowGroup in 0 until 3) {
-                Row(modifier = Modifier.weight(1f)) {
+                Row(
+                    modifier = Modifier.weight(1f),
+                    horizontalArrangement = Arrangement.spacedBy(3.dp)
+                ) {
                     for (colGroup in 0 until 3) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .fillMaxHeight()
+                                .clip(blockShape)
+                                .background(MaterialTheme.colorScheme.surface)
                                 .border(
                                     width = 1.dp,
-                                    color = heavyBorderColor
+                                    color = blockBorderColor,
+                                    shape = blockShape
                                 )
+                                .padding(1.dp)
                         ) {
-                            Column {
+                            Column(modifier = Modifier.fillMaxSize()) {
                                 for (row in 0 until 3) {
                                     Row(modifier = Modifier.weight(1f)) {
                                         for (col in 0 until 3) {

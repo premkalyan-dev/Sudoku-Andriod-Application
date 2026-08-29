@@ -33,35 +33,66 @@ class HapticManager(private val context: Context) {
     fun vibrate(type: HapticType) {
         if (!isEnabled) return
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            when (type) {
-                HapticType.LIGHT -> {
-                    vibrator.vibrate(VibrationEffect.createOneShot(20, VibrationEffect.DEFAULT_AMPLITUDE))
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                when (type) {
+                    HapticType.LIGHT -> {
+                        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_TICK))
+                    }
+                    HapticType.MEDIUM -> {
+                        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_CLICK))
+                    }
+                    HapticType.STRONG -> {
+                        vibrator.vibrate(VibrationEffect.createPredefined(VibrationEffect.EFFECT_HEAVY_CLICK))
+                    }
+                    HapticType.SUCCESS -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            vibrator.areAllPrimitivesSupported(VibrationEffect.Composition.PRIMITIVE_TICK, VibrationEffect.Composition.PRIMITIVE_CLICK)) {
+                            val composition = VibrationEffect.startComposition()
+                                .addPrimitive(VibrationEffect.Composition.PRIMITIVE_TICK, 0.6f)
+                                .addPrimitive(VibrationEffect.Composition.PRIMITIVE_CLICK, 1.0f, 50)
+                                .compose()
+                            vibrator.vibrate(composition)
+                        } else {
+                            vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 25, 40, 35), -1))
+                        }
+                    }
+                    HapticType.ERROR -> {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                            vibrator.areAllPrimitivesSupported(VibrationEffect.Composition.PRIMITIVE_THUD)) {
+                            val composition = VibrationEffect.startComposition()
+                                .addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD, 1.0f)
+                                .addPrimitive(VibrationEffect.Composition.PRIMITIVE_THUD, 1.0f, 60)
+                                .compose()
+                            vibrator.vibrate(composition)
+                        } else {
+                            vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 40, 40, 60), -1))
+                        }
+                    }
                 }
-                HapticType.MEDIUM -> {
-                    vibrator.vibrate(VibrationEffect.createOneShot(50, VibrationEffect.DEFAULT_AMPLITUDE))
+            } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                when (type) {
+                    HapticType.LIGHT -> vibrator.vibrate(VibrationEffect.createOneShot(10, 70))
+                    HapticType.MEDIUM -> vibrator.vibrate(VibrationEffect.createOneShot(18, 130))
+                    HapticType.STRONG -> vibrator.vibrate(VibrationEffect.createOneShot(40, 220))
+                    HapticType.SUCCESS -> vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 25, 40, 35), -1))
+                    HapticType.ERROR -> vibrator.vibrate(VibrationEffect.createWaveform(longArrayOf(0, 40, 40, 60), -1))
                 }
-                HapticType.STRONG -> {
-                    vibrator.vibrate(VibrationEffect.createOneShot(100, VibrationEffect.DEFAULT_AMPLITUDE))
-                }
-                HapticType.SUCCESS -> {
-                    val pattern = longArrayOf(0, 50, 50, 50)
-                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
-                }
-                HapticType.ERROR -> {
-                    val pattern = longArrayOf(0, 100, 50, 100)
-                    vibrator.vibrate(VibrationEffect.createWaveform(pattern, -1))
+            } else {
+                @Suppress("DEPRECATION")
+                when (type) {
+                    HapticType.LIGHT -> vibrator.vibrate(10)
+                    HapticType.MEDIUM -> vibrator.vibrate(20)
+                    HapticType.STRONG -> vibrator.vibrate(50)
+                    HapticType.SUCCESS -> vibrator.vibrate(longArrayOf(0, 25, 40, 35), -1)
+                    HapticType.ERROR -> vibrator.vibrate(longArrayOf(0, 40, 40, 60), -1)
                 }
             }
-        } else {
-            @Suppress("DEPRECATION")
-            when (type) {
-                HapticType.LIGHT -> vibrator.vibrate(20)
-                HapticType.MEDIUM -> vibrator.vibrate(50)
-                HapticType.STRONG -> vibrator.vibrate(100)
-                HapticType.SUCCESS -> vibrator.vibrate(longArrayOf(0, 50, 50, 50), -1)
-                HapticType.ERROR -> vibrator.vibrate(longArrayOf(0, 100, 50, 100), -1)
-            }
+        } catch (_: Exception) {
+            try {
+                @Suppress("DEPRECATION")
+                vibrator.vibrate(15)
+            } catch (_: Exception) {}
         }
     }
 }

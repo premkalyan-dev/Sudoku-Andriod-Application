@@ -492,21 +492,29 @@ fun PremiumNumberKey(
     val haptic = LocalHapticFeedback.current
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.88f else if (isSelected) 1.05f else 1f,
-        animationSpec = spring(stiffness = Spring.StiffnessLow)
+        targetValue = if (isPressed) 0.92f else if (isSelected) 1.06f else 1f,
+        animationSpec = spring(
+            dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioMediumBouncy,
+            stiffness = if (isPressed) Spring.StiffnessHigh else Spring.StiffnessMedium
+        ),
+        label = "numberKeyScale"
     )
 
     val containerColor by animateColorAsState(
-        if (isCompleted) MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.15f)
+        targetValue = if (isCompleted) MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.15f)
         else if (isSelected) MaterialTheme.colorScheme.primary
         else if (isPressed) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.surface
+        else MaterialTheme.colorScheme.surface,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
+        label = "numberKeyBg"
     )
 
     val contentColor by animateColorAsState(
-        if (isCompleted) TextMuted.copy(alpha = 0.4f)
+        targetValue = if (isCompleted) TextMuted.copy(alpha = 0.4f)
         else if (isSelected) MaterialTheme.colorScheme.onPrimary
-        else MaterialTheme.colorScheme.primary
+        else MaterialTheme.colorScheme.primary,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
+        label = "numberKeyText"
     )
 
     Surface(
@@ -525,7 +533,7 @@ fun PremiumNumberKey(
             },
         shape = RoundedCornerShape(16.dp),
         color = containerColor,
-        shadowElevation = if (isPressed || isCompleted) 0.dp else 3.dp,
+        shadowElevation = if (isPressed || isCompleted) 0.dp else 2.dp,
         border = BorderStroke(
             width = 1.dp,
             color = if (isCompleted) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
@@ -567,7 +575,14 @@ fun CompactActionButton(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val scale by animateFloatAsState(if (isPressed) 0.9f else 1f)
+    val scale by animateFloatAsState(
+        targetValue = if (isPressed) 0.90f else 1f,
+        animationSpec = spring(
+            dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioMediumBouncy,
+            stiffness = if (isPressed) Spring.StiffnessHigh else Spring.StiffnessMedium
+        ),
+        label = "actionBtnScale"
+    )
     val haptic = LocalHapticFeedback.current
 
     Column(
@@ -577,7 +592,7 @@ fun CompactActionButton(
         Box(contentAlignment = Alignment.TopEnd) {
             Surface(
                 onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                     onClick()
                 },
                 interactionSource = interactionSource,

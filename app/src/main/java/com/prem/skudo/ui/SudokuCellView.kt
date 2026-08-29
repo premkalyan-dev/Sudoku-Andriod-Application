@@ -10,11 +10,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontFamily
@@ -36,21 +37,21 @@ fun SudokuCellView(
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
     
-    // 1. Organic Color Transitions
+    // 1. Organic, Smooth Color Transitions
     val targetBackgroundColor = when {
-        cell.isAnimatingCompletion -> EasyGreen.copy(alpha = 0.4f)
-        cell.isHighlighted -> MaterialTheme.colorScheme.primary.copy(alpha = 0.15f)
-        !cell.isValid -> MaterialTheme.colorScheme.error.copy(alpha = 0.12f)
-        cell.isMatchingNumber -> MaterialTheme.colorScheme.primary.copy(alpha = 0.25f)
-        cell.isRelated -> MaterialTheme.colorScheme.primary.copy(alpha = 0.05f)
-        else -> if (boardStyle == "Glass") Color.White.copy(alpha = 0.1f) else Color.Transparent
+        cell.isAnimatingCompletion -> EasyGreen.copy(alpha = 0.45f)
+        cell.isHighlighted -> MaterialTheme.colorScheme.primary.copy(alpha = 0.20f)
+        !cell.isValid -> MaterialTheme.colorScheme.error.copy(alpha = 0.18f)
+        cell.isMatchingNumber -> MaterialTheme.colorScheme.primary.copy(alpha = 0.28f)
+        cell.isRelated -> MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+        else -> if (boardStyle == "Glass") Color.White.copy(alpha = 0.12f) else MaterialTheme.colorScheme.surface
     }
     
     val backgroundColor by animateColorAsState(
         targetValue = targetBackgroundColor,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioNoBouncy,
-            stiffness = Spring.StiffnessLow
+            stiffness = Spring.StiffnessMedium
         ),
         label = "cellBackground"
     )
@@ -61,32 +62,45 @@ fun SudokuCellView(
         else -> MaterialTheme.colorScheme.primary
     }
 
-    // 2. Tactile Scale Feedback
+    // 2. Buttery Smooth Tactile Scale Feedback
+    val targetScale = when {
+        isPressed -> 0.92f
+        cell.isAnimatingCompletion -> 1.10f
+        cell.isHighlighted -> 1.02f
+        else -> 1.0f
+    }
+
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.88f else if (cell.isAnimatingCompletion) 1.05f else 1f,
+        targetValue = targetScale,
         animationSpec = spring(
-            dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioHighBouncy,
-            stiffness = if (isPressed) Spring.StiffnessMedium else Spring.StiffnessLow
+            dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioMediumBouncy,
+            stiffness = if (isPressed) Spring.StiffnessHigh else Spring.StiffnessMediumLow
         ),
         label = "cellScale"
     )
 
-    // 3. Number "Entrance" Pop & Shake
+    // 3. Number Entrance Pop & Shake
     var lastValue by remember { mutableStateOf(cell.value) }
-    val valuePop = remember { androidx.compose.animation.core.Animatable(1f) }
-    val shakeOffset = remember { androidx.compose.animation.core.Animatable(0f) }
+    val valuePop = remember { Animatable(1f) }
+    val shakeOffset = remember { Animatable(0f) }
 
     LaunchedEffect(cell.value) {
         if (cell.value != lastValue && cell.value != null) {
             if (cell.isValid) {
-                // Pop for correct/neutral
-                valuePop.snapTo(0.5f)
-                valuePop.animateTo(1f, spring(Spring.DampingRatioHighBouncy, Spring.StiffnessMedium))
+                // Satisfying bouncy pop for valid placed digit
+                valuePop.snapTo(0.4f)
+                valuePop.animateTo(
+                    targetValue = 1f,
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMediumLow
+                    )
+                )
             } else {
-                // Shake for wrong
+                // Subtle tactile shake for error
                 repeat(3) {
-                    shakeOffset.animateTo(6f, tween(40, easing = LinearEasing))
-                    shakeOffset.animateTo(-6f, tween(40, easing = LinearEasing))
+                    shakeOffset.animateTo(5f, tween(35, easing = LinearEasing))
+                    shakeOffset.animateTo(-5f, tween(35, easing = LinearEasing))
                 }
                 shakeOffset.animateTo(0f, spring(Spring.DampingRatioMediumBouncy))
             }
@@ -94,11 +108,15 @@ fun SudokuCellView(
         lastValue = cell.value
     }
 
-    val cellShape = if (boardStyle == "Glass") RoundedCornerShape(6.dp) else RoundedCornerShape(0.dp)
+    val cellShape = when (boardStyle) {
+        "Glass" -> RoundedCornerShape(8.dp)
+        else -> RoundedCornerShape(4.dp)
+    }
 
     Box(
         modifier = modifier
             .fillMaxSize()
+            .padding(1.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
@@ -106,19 +124,18 @@ fun SudokuCellView(
             }
             .clip(cellShape)
             .background(backgroundColor)
-            .border(
-                width = 0.5.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)
-            )
             .combinedClickable(
                 interactionSource = interactionSource,
-                indication = null,
+                indication = ripple(
+                    bounded = true,
+                    color = MaterialTheme.colorScheme.primary
+                ),
                 onClick = onClick,
                 onLongClick = onLongClick
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Selection Border
+        // Selection & Highlight Rings
         if (cell.isHighlighted) {
             Box(
                 modifier = Modifier
@@ -129,15 +146,36 @@ fun SudokuCellView(
                         shape = cellShape
                     )
             )
+        } else if (cell.isMatchingNumber) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(
+                        width = 1.dp,
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                        shape = cellShape
+                    )
+            )
+        } else {
+            // Subtle subtle tile border
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .border(
+                        width = 0.5.dp,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
+                        shape = cellShape
+                    )
+            )
         }
         
         if (cell.value != null) {
             Text(
                 text = cell.value.toString(),
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = 28.sp,
-                    fontWeight = if (cell.isClue) FontWeight.ExtraBold else FontWeight.Normal,
-                    fontFamily = FontFamily.SansSerif // Or a custom premium font if available
+                    fontSize = 26.sp,
+                    fontWeight = if (cell.isClue) FontWeight.ExtraBold else FontWeight.Bold,
+                    fontFamily = FontFamily.SansSerif
                 ),
                 color = textColor,
                 modifier = Modifier.graphicsLayer {
@@ -166,8 +204,9 @@ fun SudokuCellNotes(notes: Set<Int>) {
                     val note = i * 3 + j
                     Text(
                         text = if (notes.contains(note)) note.toString() else "",
-                        fontSize = 10.sp,
-                        lineHeight = 10.sp,
+                        fontSize = 9.sp,
+                        lineHeight = 9.sp,
+                        fontWeight = FontWeight.SemiBold,
                         color = TextMuted
                     )
                 }

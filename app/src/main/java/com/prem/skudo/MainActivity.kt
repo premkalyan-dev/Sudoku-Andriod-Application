@@ -366,7 +366,7 @@ fun LoadingScreen(onLoadingComplete: () -> Unit) {
         }
         
         // Text animation starts slightly later
-        delay(400L)
+        delay(200L)
         launch {
             textAlpha.animateTo(
                 targetValue = 1f,
@@ -374,8 +374,8 @@ fun LoadingScreen(onLoadingComplete: () -> Unit) {
             )
         }
 
-        // Keep splash for a meaningful "brand" moment
-        delay(1800)
+        // Brief brand moment
+        delay(800)
         onLoadingComplete()
     }
 
