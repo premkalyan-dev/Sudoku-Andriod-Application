@@ -88,6 +88,8 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun forceStartNewGame(difficulty: Difficulty, isDaily: Boolean = false) {
         _uiState.update { 
             it.copy(
+                puzzle = SudokuBoard(),
+                solution = SudokuBoard(),
                 isLoading = true, 
                 difficulty = difficulty, 
                 isDailyChallenge = isDaily, 
@@ -95,7 +97,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 showLeaveDialog = false,
                 showRestartConfirmation = false,
                 showDiscardConfirmation = false,
-                isPaused = false
+                isPaused = false,
+                selectedCell = null,
+                selectedNumber = null,
+                mistakes = 0
             ) 
         }
         _timerSeconds.value = 0
@@ -128,12 +133,16 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun continueGame(difficulty: Difficulty, isDaily: Boolean = false) {
         _uiState.update { 
             it.copy(
+                puzzle = SudokuBoard(),
+                solution = SudokuBoard(),
                 isLoading = true, 
                 showStartNewConfirmation = false,
                 showLeaveDialog = false,
                 showRestartConfirmation = false,
                 showDiscardConfirmation = false,
-                isPaused = false
+                isPaused = false,
+                selectedCell = null,
+                selectedNumber = null
             ) 
         }
         _timerSeconds.value = 0
