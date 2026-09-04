@@ -110,35 +110,20 @@ fun SudokuCellView(
         lastValue = cell.value
     }
 
-    val cellShape = when (boardStyle) {
-        "Glass" -> RoundedCornerShape(8.dp)
-        else -> RoundedCornerShape(4.dp)
-    }
-
-    // Compute border once — avoids 3 nested Box composables per cell
-    val borderWidth = when {
-        cell.isHighlighted -> 2.dp
-        cell.isMatchingNumber -> 1.dp
-        else -> 0.5.dp
-    }
-    val borderColor = when {
-        cell.isHighlighted -> MaterialTheme.colorScheme.primary
-        cell.isMatchingNumber -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
-        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
-    }
-
     Box(
         modifier = modifier
             .fillMaxSize()
-            .padding(1.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
                 translationX = shakeOffset.value
             }
-            .clip(cellShape)
             .background(backgroundColor)
-            .border(borderWidth, borderColor, cellShape)
+            .then(
+                if (cell.isHighlighted) {
+                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary)
+                } else Modifier
+            )
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = ripple(
