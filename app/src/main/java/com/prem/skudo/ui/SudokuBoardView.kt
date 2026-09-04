@@ -72,8 +72,11 @@ fun SudokuBoardView(
                                             key("${actualRow}_${actualCol}") {
                                                 SudokuCellView(
                                                     cell = board[actualRow, actualCol],
-                                                    onClick = { onCellClick(actualRow, actualCol) },
-                                                    onLongClick = { onCellLongClick(actualRow, actualCol) },
+                                                    row = actualRow,
+                                                    col = actualCol,
+                                                    // Pass stable references — no inline lambda allocation
+                                                    onClick = onCellClick,
+                                                    onLongClick = onCellLongClick,
                                                     modifier = Modifier.weight(1f),
                                                     boardStyle = boardStyle
                                                 )
@@ -89,3 +92,4 @@ fun SudokuBoardView(
         }
     }
 }
+

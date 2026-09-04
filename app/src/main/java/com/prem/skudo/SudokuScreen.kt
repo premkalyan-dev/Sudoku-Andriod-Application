@@ -67,6 +67,8 @@ fun SudokuGameScreen(
     viewModel: SudokuViewModel = viewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    // Timer observed separately to avoid full-screen recomposition every second
+    val timerSeconds by viewModel.timerSeconds.collectAsState()
     val lifecycleOwner = LocalLifecycleOwner.current
 
     DisposableEffect(lifecycleOwner) {
@@ -85,6 +87,7 @@ fun SudokuGameScreen(
 
     SudokuScreenContent(
         uiState = uiState,
+        timerSeconds = timerSeconds,
         onBack = onBack,
         onPause = viewModel::pauseGame,
         onResume = viewModel::resumeGame,
@@ -123,6 +126,7 @@ fun SudokuGameScreen(
 @Composable
 fun SudokuScreenContent(
     uiState: GameState,
+    timerSeconds: Long,
     onBack: () -> Unit,
     onPause: () -> Unit,
     onResume: () -> Unit,
@@ -158,7 +162,7 @@ fun SudokuScreenContent(
             onSaveAndExit = onSaveAndExit,
             onRestartGame = onRestartGame,
             difficulty = uiState.difficulty,
-            timerSeconds = uiState.timerSeconds
+            timerSeconds = timerSeconds
         )
     }
 
@@ -188,7 +192,7 @@ fun SudokuScreenContent(
         ) {
             // 1. Premium Header (Compact & Elegant)
             PremiumGameHeader(
-                timerSeconds = uiState.timerSeconds,
+                timerSeconds = timerSeconds,
                 onBack = { onPause() },
                 onPauseToggle = onPause
             )
@@ -836,10 +840,10 @@ fun SudokuScreenPreview() {
             uiState = GameState(
                 puzzle = SudokuBoard(),
                 difficulty = Difficulty.MEDIUM,
-                timerSeconds = 125,
                 mistakes = 1,
                 maxMistakes = 3
             ),
+            timerSeconds = 125,
             onBack = {},
             onPause = {},
             onResume = {},

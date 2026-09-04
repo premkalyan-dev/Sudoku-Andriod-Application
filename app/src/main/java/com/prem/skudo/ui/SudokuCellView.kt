@@ -29,8 +29,10 @@ import com.prem.skudo.ui.theme.*
 @Composable
 fun SudokuCellView(
     cell: SudokuCell,
-    onClick: () -> Unit,
-    onLongClick: () -> Unit,
+    row: Int,
+    col: Int,
+    onClick: (Int, Int) -> Unit,
+    onLongClick: (Int, Int) -> Unit,
     modifier: Modifier = Modifier,
     boardStyle: String = "Modern",
 ) {
@@ -113,6 +115,18 @@ fun SudokuCellView(
         else -> RoundedCornerShape(4.dp)
     }
 
+    // Compute border once — avoids 3 nested Box composables per cell
+    val borderWidth = when {
+        cell.isHighlighted -> 2.dp
+        cell.isMatchingNumber -> 1.dp
+        else -> 0.5.dp
+    }
+    val borderColor = when {
+        cell.isHighlighted -> MaterialTheme.colorScheme.primary
+        cell.isMatchingNumber -> MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -124,51 +138,18 @@ fun SudokuCellView(
             }
             .clip(cellShape)
             .background(backgroundColor)
+            .border(borderWidth, borderColor, cellShape)
             .combinedClickable(
                 interactionSource = interactionSource,
                 indication = ripple(
                     bounded = true,
                     color = MaterialTheme.colorScheme.primary
                 ),
-                onClick = onClick,
-                onLongClick = onLongClick
+                onClick = { onClick(row, col) },
+                onLongClick = { onLongClick(row, col) }
             ),
         contentAlignment = Alignment.Center
     ) {
-        // Selection & Highlight Rings
-        if (cell.isHighlighted) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .border(
-                        width = 2.dp,
-                        color = MaterialTheme.colorScheme.primary,
-                        shape = cellShape
-                    )
-            )
-        } else if (cell.isMatchingNumber) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .border(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-                        shape = cellShape
-                    )
-            )
-        } else {
-            // Subtle subtle tile border
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .border(
-                        width = 0.5.dp,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f),
-                        shape = cellShape
-                    )
-            )
-        }
-        
         if (cell.value != null) {
             Text(
                 text = cell.value.toString(),
@@ -214,3 +195,4 @@ fun SudokuCellNotes(notes: Set<Int>) {
         }
     }
 }
+

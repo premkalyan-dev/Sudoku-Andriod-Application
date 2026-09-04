@@ -32,6 +32,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private val _uiState = MutableStateFlow(GameState())
     val uiState: StateFlow<GameState> = _uiState.asStateFlow()
 
+    // Timer is decoupled from GameState so the board/controls don't recompose every second.
+    // Only UI components that display the timer need to observe this.
+    private val _timerSeconds = MutableStateFlow(0L)
+    val timerSeconds: StateFlow<Long> = _timerSeconds.asStateFlow()
+
     private val undoStack = ArrayDeque<SudokuBoard>()
     private val redoStack = ArrayDeque<SudokuBoard>()
     private var autoSaveJob: kotlinx.coroutines.Job? = null
@@ -82,6 +87,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun forceStartNewGame(difficulty: Difficulty, isDaily: Boolean = false) {
         _uiState.update { it.copy(isLoading = true, difficulty = difficulty, isDailyChallenge = isDaily, showStartNewConfirmation = false) }
+        _timerSeconds.value = 0
         viewModelScope.launch(Dispatchers.Default) {
             val (puzzle, solution) = generator.generate(difficulty)
             undoStack.clear()
@@ -100,7 +106,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     selectedCell = null,
                     mistakes = 0,
                     hintsRemaining = profile.hints,
-                    timerSeconds = 0,
                     showLeaveDialog = false
                 )
             }
@@ -111,6 +116,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun continueGame(difficulty: Difficulty, isDaily: Boolean = false) {
         _uiState.update { it.copy(isLoading = true, showStartNewConfirmation = false) }
+        _timerSeconds.value = 0
         viewModelScope.launch(Dispatchers.IO) {
             val saved = repository.getSavedGame(difficulty, isDaily) ?: return@launch
             val puzzle = gson.fromJson(saved.puzzleJson, SudokuBoard::class.java)
@@ -124,7 +130,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     puzzle = puzzle,
                     solution = solution,
                     difficulty = if (saved.isDailyChallenge) Difficulty.EXPERT else Difficulty.valueOf(saved.difficulty),
-                    timerSeconds = saved.timerSeconds,
                     mistakes = saved.mistakes,
                     maxMistakes = saved.maxMistakes,
                     hintsRemaining = saved.hintsRemaining,
@@ -138,14 +143,17 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     lastPlayedTimestamp = saved.lastPlayedTimestamp
                 )
             }
+            _timerSeconds.value = saved.timerSeconds
             startTimer()
             _uiState.update { updateHighlights(it) }
         }
     }
 
     private fun startTimer() {
-        timerManager.start(_uiState.value.timerSeconds) { seconds ->
-            _uiState.update { it.copy(timerSeconds = seconds) }
+        timerManager.start(_timerSeconds.value) { seconds ->
+            // Update only the separate timer flow — NOT _uiState.
+            // This prevents the entire game screen from recomposing every second.
+            _timerSeconds.value = seconds
             if ((seconds % 30) == 0L) autoSave()
         }
     }
@@ -203,7 +211,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 updateHighlights(newState)
             }
         }
-        autoSave()
+        // No autoSave on cell selection — saves happen on actual moves (enterNumber, erase, hint, undo/redo)
     }
 
     fun selectNumber(num: Int) {
@@ -242,71 +250,105 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun enterNumber(num: Int) {
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
 
-        // Update selected number so the pad highlights it
-        _uiState.update { it.copy(selectedNumber = num) }
+        val currentState = _uiState.value
+        val (row, col) = currentState.selectedCell ?: run {
+            // No cell selected — just update the selected number for digit-first mode
+            _uiState.update { it.copy(selectedNumber = num) }
+            return
+        }
+        val currentCell = currentState.puzzle[row, col]
 
-        val (row, col) = _uiState.value.selectedCell ?: return
-        val currentCell = _uiState.value.puzzle[row, col]
-
-        if ((currentCell.isClue) || (currentCell.value == num)) return
+        if ((currentCell.isClue) || (currentCell.value == num)) {
+            _uiState.update { it.copy(selectedNumber = num) }
+            return
+        }
 
         soundManager.playSound("place_number")
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
 
-        if (_uiState.value.isNotesMode) {
+        if (currentState.isNotesMode) {
+            // Also update selectedNumber in the same conceptual action
+            _uiState.update { it.copy(selectedNumber = num) }
             updateNotes(row, col, num)
         } else {
             saveToUndoStack()
             
-            _uiState.update { currentState ->
-                val correctValue = currentState.solution[row, col].value
+            // Single atomic state update — value placement + highlights + note removal all in one pass
+            _uiState.update { state ->
+                val correctValue = state.solution[row, col].value
                 val actuallyCorrect = num == correctValue
-                val isCorrect = !currentState.autoCheck || actuallyCorrect
+                val isCorrect = !state.autoCheck || actuallyCorrect
                 
-                var newMistakes = currentState.mistakes
+                var newMistakes = state.mistakes
                 
-                if (!actuallyCorrect && currentState.autoCheck) {
+                if (!actuallyCorrect && state.autoCheck) {
                     newMistakes++
                     soundManager.playSound("mistake")
                     hapticManager.vibrate(com.prem.skudo.utils.HapticType.STRONG)
-                    if (currentState.maxMistakes in 1..newMistakes) {
+                    if (state.maxMistakes in 1..newMistakes) {
                         timerManager.stop()
-                        return@update currentState.copy(
+                        return@update state.copy(
+                            selectedNumber = num,
                             mistakes = newMistakes,
                             showContinueDialog = true
                         )
                     }
                 }
-                
-                val newCells = currentState.puzzle.cells.mapIndexed { ri, rowList ->
+
+                // Selected cell info for highlights
+                val selR = row
+                val selC = col
+                val selectedValue = num // The value being placed
+                val shouldAutoRemoveNotes = state.autoRemoveNotes && actuallyCorrect
+
+                // Single unified pass over all 81 cells:
+                // - Place digit at (row, col)
+                // - Update highlight/related/matching states
+                // - Remove notes from related cells if needed
+                val newCells = state.puzzle.cells.mapIndexed { ri, rowList ->
                     rowList.mapIndexed { ci, cell ->
-                        if (ri == row && ci == col) {
+                        val isTarget = ri == row && ci == col
+                        
+                        // 1. Place the digit
+                        val updatedCell = if (isTarget) {
                             cell.copy(value = num, isValid = isCorrect, notes = emptySet())
                         } else cell
-                    }
-                }
-                
-                val baseUpdatedState = currentState.copy(
-                    puzzle = SudokuBoard(newCells),
-                    mistakes = newMistakes,
-                )
-                
-                val highlightedState = updateHighlights(baseUpdatedState)
-                
-                val finalCells = if (currentState.autoRemoveNotes && actuallyCorrect) {
-                    highlightedState.puzzle.cells.mapIndexed { ri, rowList ->
-                        rowList.mapIndexed { ci, cell ->
+
+                        // 2. Compute highlights
+                        val newHighlighted = ri == selR && ci == selC
+                        val newRelated = state.highlightRelated && (ri == selR || ci == selC || (ri / 3 == selR / 3 && ci / 3 == selC / 3))
+                        val newMatching = state.highlightIdentical && updatedCell.value == selectedValue
+
+                        // 3. Auto-remove notes from related cells
+                        val updatedNotes = if (!isTarget && shouldAutoRemoveNotes) {
                             val inSameBox = (ri / 3 == row / 3 && ci / 3 == col / 3)
                             if (ri == row || ci == col || inSameBox) {
-                                cell.copy(notes = cell.notes - num)
-                            } else cell
+                                updatedCell.notes - num
+                            } else updatedCell.notes
+                        } else updatedCell.notes
+
+                        // Only create a new copy if something actually changed
+                        if (updatedCell.isHighlighted == newHighlighted &&
+                            updatedCell.isRelated == newRelated &&
+                            updatedCell.isMatchingNumber == newMatching &&
+                            updatedCell.notes == updatedNotes) {
+                            updatedCell
+                        } else {
+                            updatedCell.copy(
+                                isHighlighted = newHighlighted,
+                                isRelated = newRelated,
+                                isMatchingNumber = newMatching,
+                                notes = updatedNotes
+                            )
                         }
                     }
-                } else {
-                    highlightedState.puzzle.cells
                 }
                 
-                val finalState = highlightedState.copy(puzzle = SudokuBoard(finalCells))
+                val finalState = state.copy(
+                    puzzle = SudokuBoard(newCells),
+                    selectedNumber = num,
+                    mistakes = newMistakes,
+                )
                 checkCompletions(finalState, row, col)
             }
             checkVictory()
@@ -509,10 +551,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }
         if (isSolved) {
             timerManager.stop()
+            val finalTime = _timerSeconds.value
             soundManager.playSound("victory")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.SUCCESS)
             
-            _uiState.update { it.copy(isGameOver = true, isVictory = true, isLoading = true) }
+            _uiState.update { it.copy(isGameOver = true, isVictory = true, isLoading = true, timerSeconds = finalTime) }
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
@@ -520,15 +563,15 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     
                     val rewards = rewardRepository.processGameResult(
                         state.difficulty,
-                        state.timerSeconds,
+                        finalTime,
                         state.mistakes,
                         hintsUsed,
                         isWin = true,
                         isDailyChallenge = state.isDailyChallenge
                     )
 
-                    repository.updateStats(state.difficulty, isWin = true, state.timerSeconds)
-                    repository.addGameToHistory(state.difficulty, state.timerSeconds, state.mistakes, hintsUsed, true, state.isDailyChallenge)
+                    repository.updateStats(state.difficulty, isWin = true, finalTime)
+                    repository.addGameToHistory(state.difficulty, finalTime, state.mistakes, hintsUsed, true, state.isDailyChallenge)
                     
                     val allAchievements = repository.allAchievements.first()
                     var totalWins = 0
@@ -537,7 +580,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     }
                     
                     val newlyUnlocked = com.prem.skudo.utils.AchievementManager.checkAchievements(
-                        allAchievements, state.difficulty, state.timerSeconds, state.mistakes, hintsUsed, totalWins
+                        allAchievements, state.difficulty, finalTime, state.mistakes, hintsUsed, totalWins
                     )
                     
                     newlyUnlocked.forEach { achievement ->
@@ -551,7 +594,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                             date = today,
                             difficulty = state.difficulty.name,
                             isCompleted = true,
-                            completionTimeSeconds = state.timerSeconds,
+                            completionTimeSeconds = finalTime,
                             completionTimestamp = System.currentTimeMillis()
                         ))
                     }
@@ -585,10 +628,11 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         
         autoSaveJob?.cancel()
         
+        val currentTimerSeconds = _timerSeconds.value
         val saveBlock: suspend () -> Unit = {
             repository.saveCurrentGame(
                 state.puzzle, state.solution, state.difficulty,
-                state.timerSeconds, state.mistakes, state.maxMistakes, 
+                currentTimerSeconds, state.mistakes, state.maxMistakes, 
                 state.hintsRemaining, state.isDailyChallenge,
                 state.selectedCell
             )
@@ -648,10 +692,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 isGameOver = false,
                 isVictory = false,
                 isPaused = false,
-                mistakes = 0,
-                timerSeconds = 0
+                mistakes = 0
             )
         }
+        _timerSeconds.value = 0
         startTimer()
         autoSave()
     }
@@ -709,19 +753,20 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun gameOver() {
         val currentState = _uiState.value
+        val finalTime = _timerSeconds.value
         _uiState.update { it.copy(isGameOver = true, showContinueDialog = false) }
         viewModelScope.launch {
-            repository.updateStats(currentState.difficulty, isWin = false, currentState.timerSeconds)
+            repository.updateStats(currentState.difficulty, isWin = false, finalTime)
             userRepository.addGameResults(
                 currentState.difficulty,
-                currentState.timerSeconds,
+                finalTime,
                 currentState.mistakes,
                 3 - currentState.hintsRemaining,
                 isWin = false
             )
             repository.addGameToHistory(
                 currentState.difficulty,
-                currentState.timerSeconds,
+                finalTime,
                 currentState.mistakes,
                 3 - currentState.hintsRemaining,
                 isWin = false,

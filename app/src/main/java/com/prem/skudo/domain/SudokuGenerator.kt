@@ -66,7 +66,9 @@ class SudokuGenerator(
             val temp = board[r][c]
             board[r][c] = 0
             
-            if (solver.countSolutions(Array(9) { i -> board[i].copyOf() }) != 1) {
+            // countSolutions is pure bitmask-based and does NOT mutate the board,
+            // so no defensive copy is needed.
+            if (solver.countSolutions(board) != 1) {
                 board[r][c] = temp
             } else {
                 currentClues--

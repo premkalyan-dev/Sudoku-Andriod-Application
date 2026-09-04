@@ -54,6 +54,10 @@ class SudokuSolver(private val validator: SudokuValidator = SudokuValidator()) {
         return solveRecursive(0)
     }
 
+    /**
+     * Counts solutions using bitmasks only — does NOT mutate the input board.
+     * Safe to call without copying the board first.
+     */
     fun countSolutions(board: Array<IntArray>, limit: Int = 2): Int {
         val rowMasks = IntArray(9)
         val colMasks = IntArray(9)
@@ -92,6 +96,7 @@ class SudokuSolver(private val validator: SudokuValidator = SudokuValidator()) {
             for (num in 1..9) {
                 val bit = 1 shl num
                 if ((used and bit) == 0) {
+                    // Pure bitmask tracking — no board mutation needed
                     rowMasks[r] = rowMasks[r] or bit
                     colMasks[c] = colMasks[c] or bit
                     boxMasks[b] = boxMasks[b] or bit

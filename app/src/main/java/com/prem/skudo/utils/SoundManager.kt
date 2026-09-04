@@ -8,14 +8,21 @@ import android.media.ToneGenerator
 import com.prem.skudo.repository.SettingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.asCoroutineDispatcher
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 
 class SoundManager(private val context: Context) {
     private val settingsRepository = SettingsRepository(context)
     private val soundPool: SoundPool
     private val sounds = mutableMapOf<String, Int>()
     private var isEnabled = true
+    
+    // Dedicated single-thread dispatcher for audio calls to avoid blocking the UI thread.
+    // ToneGenerator.startTone() is a synchronous Binder IPC call that can block 15-50ms+.
+    private val audioDispatcher = Executors.newSingleThreadExecutor().asCoroutineDispatcher()
+    private val audioScope = CoroutineScope(audioDispatcher)
     
     // ToneGenerator for "Hardware" sounds (Copyright Free & Zero-File)
     private val toneGenerator = ToneGenerator(AudioManager.STREAM_MUSIC, 100)
@@ -48,48 +55,49 @@ class SoundManager(private val context: Context) {
     fun playSound(name: String) {
         if (!isEnabled) return
         
-        when (name) {
-            "victory" -> playVictoryFanfare()
-            "completion" -> playCompletionChime()
-            "mistake" -> playMistakeTone()
-            "place_number", "erase", "undo", "redo" -> playGenericTap()
-            else -> {
-                sounds[name]?.let { id ->
-                    soundPool.play(id, 1.0f, 1.0f, 0, 0, 1.0f)
+        // Dispatch all audio to background thread to prevent UI thread blocking
+        audioScope.launch {
+            try {
+                when (name) {
+                    "victory" -> playVictoryFanfare()
+                    "completion" -> playCompletionChime()
+                    "mistake" -> playMistakeTone()
+                    "place_number", "erase", "undo", "redo" -> playGenericTap()
+                    else -> {
+                        sounds[name]?.let { id ->
+                            soundPool.play(id, 1.0f, 1.0f, 0, 0, 1.0f)
+                        }
+                    }
                 }
+            } catch (_: Exception) {
+                // Silently ignore audio errors — never crash the game for a sound
             }
         }
     }
 
-    private fun playVictoryFanfare() {
-        if (!isEnabled) return
-        CoroutineScope(Dispatchers.Default).launch {
-            // Upbeat "Win" melody
-            val sequence = listOf(
-                ToneGenerator.TONE_DTMF_1 to 100,
-                ToneGenerator.TONE_DTMF_4 to 100,
-                ToneGenerator.TONE_DTMF_7 to 100,
-                ToneGenerator.TONE_DTMF_9 to 400
-            )
-            sequence.forEach { (tone, duration) ->
-                toneGenerator.startTone(tone, duration)
-                delay(duration + 20L)
-            }
+    private suspend fun playVictoryFanfare() {
+        // Upbeat "Win" melody
+        val sequence = listOf(
+            ToneGenerator.TONE_DTMF_1 to 100,
+            ToneGenerator.TONE_DTMF_4 to 100,
+            ToneGenerator.TONE_DTMF_7 to 100,
+            ToneGenerator.TONE_DTMF_9 to 400
+        )
+        sequence.forEach { (tone, duration) ->
+            toneGenerator.startTone(tone, duration)
+            delay(duration + 20L)
         }
     }
 
     private fun playCompletionChime() {
-        if (!isEnabled) return
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 150)
     }
 
     private fun playMistakeTone() {
-        if (!isEnabled) return
         toneGenerator.startTone(ToneGenerator.TONE_PROP_NACK, 200)
     }
 
     private fun playGenericTap() {
-        if (!isEnabled) return
         toneGenerator.startTone(ToneGenerator.TONE_PROP_BEEP, 50)
     }
 
@@ -98,3 +106,4 @@ class SoundManager(private val context: Context) {
         toneGenerator.release()
     }
 }
+
