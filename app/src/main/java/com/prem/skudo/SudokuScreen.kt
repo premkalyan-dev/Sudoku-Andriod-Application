@@ -442,7 +442,7 @@ fun PremiumNumberPad(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(top = 4.dp),
+            .padding(horizontal = 2.dp, vertical = 6.dp),
         horizontalArrangement = Arrangement.spacedBy(6.dp)
     ) {
         (1..9).forEach { num ->
@@ -452,9 +452,9 @@ fun PremiumNumberPad(
                 
                 PremiumNumberKey(
                     num = num,
-                    remaining = 9 - count,
                     isCompleted = isCompleted,
                     isSelected = selectedNumber == num,
+                    isNotesMode = isNotesMode,
                     modifier = Modifier.weight(1f),
                     onClick = { if (!isCompleted) onNumberClick(num) }
                 )
@@ -466,9 +466,9 @@ fun PremiumNumberPad(
 @Composable
 fun PremiumNumberKey(
     num: Int,
-    remaining: Int,
     isCompleted: Boolean,
     isSelected: Boolean,
+    isNotesMode: Boolean,
     modifier: Modifier,
     onClick: () -> Unit
 ) {
@@ -477,30 +477,43 @@ fun PremiumNumberKey(
     val haptic = LocalHapticFeedback.current
 
     val scale by animateFloatAsState(
-        targetValue = if (isPressed) 0.92f else if (isSelected) 1.06f else 1f,
+        targetValue = if (isPressed) 0.88f else if (isSelected) 1.08f else 1f,
         animationSpec = spring(
             dampingRatio = if (isPressed) Spring.DampingRatioNoBouncy else Spring.DampingRatioMediumBouncy,
-            stiffness = if (isPressed) Spring.StiffnessHigh else Spring.StiffnessMedium
+            stiffness = if (isPressed) Spring.StiffnessHigh else Spring.StiffnessMediumLow
         ),
         label = "numberKeyScale"
     )
 
+    val elevation by animateDpAsState(
+        targetValue = if (isCompleted) 0.dp else if (isSelected) 6.dp else if (isPressed) 1.dp else 2.5.dp,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
+        label = "numberKeyElevation"
+    )
+
     val containerColor by animateColorAsState(
-        targetValue = if (isCompleted) MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.15f)
-        else if (isSelected) MaterialTheme.colorScheme.primary
-        else if (isPressed) MaterialTheme.colorScheme.primaryContainer
-        else MaterialTheme.colorScheme.surface,
+        targetValue = when {
+            isCompleted -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.25f)
+            isSelected -> MaterialTheme.colorScheme.primary
+            isPressed -> MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f)
+            else -> MaterialTheme.colorScheme.surface
+        },
         animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
         label = "numberKeyBg"
     )
 
     val contentColor by animateColorAsState(
-        targetValue = if (isCompleted) TextMuted.copy(alpha = 0.4f)
-        else if (isSelected) MaterialTheme.colorScheme.onPrimary
-        else MaterialTheme.colorScheme.primary,
+        targetValue = when {
+            isCompleted -> TextMuted.copy(alpha = 0.35f)
+            isSelected -> MaterialTheme.colorScheme.onPrimary
+            isPressed -> MaterialTheme.colorScheme.onPrimaryContainer
+            else -> MaterialTheme.colorScheme.onSurface
+        },
         animationSpec = spring(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMedium),
         label = "numberKeyText"
     )
+
+    val keyShape = RoundedCornerShape(14.dp)
 
     Surface(
         onClick = {
@@ -511,40 +524,43 @@ fun PremiumNumberKey(
         },
         interactionSource = interactionSource,
         modifier = modifier
-            .aspectRatio(0.7f)
+            .height(54.dp)
             .graphicsLayer {
                 scaleX = scale
                 scaleY = scale
             },
-        shape = RoundedCornerShape(16.dp),
+        shape = keyShape,
         color = containerColor,
-        shadowElevation = if (isPressed || isCompleted) 0.dp else 2.dp,
+        shadowElevation = elevation,
         border = BorderStroke(
-            width = 1.dp,
-            color = if (isCompleted) Color.Transparent else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.2f)
+            width = if (isSelected) 1.5.dp else 1.dp,
+            color = when {
+                isCompleted -> Color.Transparent
+                isSelected -> MaterialTheme.colorScheme.primary.copy(alpha = 0.6f)
+                else -> MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f)
+            }
         )
     ) {
-        Column(
+        Box(
             modifier = Modifier.fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = num.toString(),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.ExtraBold,
-                color = contentColor
-            )
-            if (!isCompleted) {
-                Text(
-                    text = "($remaining)",
-                    style = MaterialTheme.typography.labelSmall,
-                    fontWeight = FontWeight.Bold,
-                    color = if (isSelected) MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.7f) else TextMuted,
-                    fontSize = 9.sp
+            if (isCompleted) {
+                Icon(
+                    imageVector = Icons.Default.Check,
+                    contentDescription = "Completed",
+                    modifier = Modifier.size(18.dp),
+                    tint = EasyGreen.copy(alpha = 0.6f)
                 )
             } else {
-                Icon(Icons.Default.Check, null, modifier = Modifier.size(12.dp), tint = if (isSelected) MaterialTheme.colorScheme.onPrimary else EasyGreen.copy(alpha = 0.5f))
+                Text(
+                    text = num.toString(),
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontSize = 22.sp,
+                        fontWeight = if (isSelected) FontWeight.Black else FontWeight.Bold
+                    ),
+                    color = contentColor
+                )
             }
         }
     }
