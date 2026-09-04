@@ -146,32 +146,19 @@ class MainActivity : ComponentActivity() {
                         ) {
                             val homeState by homeViewModel.uiState.collectAsState()
                             
-                            if (homeState.userProfile?.level == 1 && homeState.userProfile?.xp == 0L) {
-                                OnboardingScreen(
-                                    onComplete = {
-                                        navController.navigate("home") {
-                                            popUpTo("home") { inclusive = true }
-                                        }
-                                    },
-                                    onStartTutorial = {
-                                        navController.navigate("game/EASY?isDaily=false")
-                                    }
-                                )
-                            } else {
-                                SudokuHomeScreen(
-                                    onStartGame = { difficulty, isDaily ->
-                                        navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=false")
-                                    },
-                                    onContinueGame = { difficulty, isDaily ->
-                                        navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=true")
-                                    },
-                                    onDailyChallenge = { navController.navigate("daily_challenge") },
-                                    onViewProfile = { navController.navigate("profile") },
-                                    onSettings = { navController.navigate("settings") },
-                                    onShop = { navController.navigate("shop") },
-                                    viewModel = homeViewModel
-                                )
-                            }
+                            SudokuHomeScreen(
+                                onStartGame = { difficulty, isDaily ->
+                                    navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=false")
+                                },
+                                onContinueGame = { difficulty, isDaily ->
+                                    navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=true")
+                                },
+                                onDailyChallenge = { navController.navigate("daily_challenge") },
+                                onViewProfile = { navController.navigate("profile") },
+                                onSettings = { navController.navigate("settings") },
+                                onShop = { navController.navigate("shop") },
+                                viewModel = homeViewModel
+                            )
                         }
                         composable("profile") {
                             ProfileScreen(
