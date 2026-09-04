@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy - Skudo</title>
+  <meta name="description" content="Official Privacy Policy for Skudo (com.prem.skudo) - Transparent data safety, user privacy practices, and account deletion guidelines in full compliance with Google Play Developer Policies.">
+  <meta name="robots" content="index, follow">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0b0f19;
+      --bg-secondary: #111827;
+      --bg-card: rgba(17, 24, 39, 0.75);
+      --border-color: rgba(255, 255, 255, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.3);
+      --text-primary: #f3f4f6;
+      --text-secondary: #9ca3af;
+      --text-muted: #6b7280;
+      --accent-primary: #6366f1;
+      --accent-secondary: #8b5cf6;
+      --accent-glow: rgba(99, 102, 241, 0.2);
+      --accent-gradient: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #ec4899 100%);
+      --success: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.1);
+      --warning: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.1);
+      --danger: #ef4444;
+      --danger-bg: rgba(239, 68, 68, 0.1);
+      --radius-sm: 8px;
+      --radius-md: 14px;
+      --radius-lg: 20px;
+      --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+      --shadow-glow: 0 0 30px rgba(99, 102, 241, 0.25);
+    }
+
+    [data-theme="light"] {
+      --bg-primary: #f8fafc;
+      --bg-secondary: #ffffff;
+      --bg-card: rgba(255, 255, 255, 0.85);
+      --border-color: rgba(0, 0, 0, 0.08);
+      --border-highlight: rgba(99, 102, 241, 0.4);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --accent-primary: #4f46e5;
+      --accent-secondary: #7c3aed;
+      --accent-glow: rgba(79, 70, 229, 0.15);
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+      --shadow-md: 0 10px 25px -5px rgba(0, 0, 0, 0.08);
+      --shadow-glow: 0 0 30px rgba(79, 70, 229, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.68;
+      overflow-x: hidden;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Ambient background blur effects */
+    .ambient-glow {
+      position: fixed;
+      top: -200px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 900px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.08) 40%, transparent 70%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* Header & Navigation */
+    header.site-header {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background-color: rgba(11, 15, 25, 0.82);
+      border-bottom: 1px solid var(--border-color);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    [data-theme="light"] header.site-header {
+      background-color: rgba(248, 250, 252, 0.85);
+    }
+
+    .header-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .app-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: var(--accent-gradient);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 800;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .brand-title {
+      font-weight: 800;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 8px 16px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      border: 1px solid transparent;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-secondary {
+      background-color: var(--bg-secondary);
+      border-color: var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+    }
+
+    .btn-primary {
+      background: var(--accent-gradient);
+      color: #ffffff;
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.95;
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(99, 102, 241, 0.45);
+    }
+
+    .theme-toggle {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--accent-primary);
+    }
+
+    /* Hero Banner */
+    .hero-section {
+      position: relative;
+      padding: 60px 24px 40px;
+      text-align: center;
+      z-index: 1;
+    }
+
+    .hero-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid var(--border-highlight);
+      color: var(--accent-primary);
+      font-size: 0.8125rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    .status-badge .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background-color: var(--success);
+      box-shadow: 0 0 8px var(--success);
+    }
+
+    h1.page-title {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.15;
+      margin-bottom: 16px;
+      background: linear-gradient(180deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-description {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 680px;
+      margin: 0 auto 24px;
+    }
+
+    .meta-cards {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: var(--radius-sm);
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      font-size: 0.8125rem;
+      color: var(--text-muted);
+    }
+
+    .meta-chip strong {
+      color: var(--text-primary);
+    }
+
+    /* Main Content Layout */
+    .main-layout {
+      position: relative;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 20px 24px 80px;
+      display: grid;
+      grid-template-columns: 280px 1fr;
+      gap: 40px;
+      z-index: 1;
+    }
+
+    @media (max-width: 900px) {
+      .main-layout {
+        grid-template-columns: 1fr;
+      }
+      .toc-sidebar {
+        display: none;
+      }
+    }
+
+    /* Table of Contents Sidebar */
+    .toc-sidebar {
+      position: sticky;
+      top: 90px;
+      height: fit-content;
+      max-height: calc(100vh - 120px);
+      overflow-y: auto;
+      padding-right: 12px;
+    }
+
+    .toc-box {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 20px;
+    }
+
+    .toc-title {
+      font-size: 0.875rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    .toc-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toc-link {
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .toc-link:hover, .toc-link.active {
+      color: var(--accent-primary);
+      background-color: var(--accent-glow);
+    }
+
+    /* Content Area */
+    .content-area {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .policy-card {
+      background: var(--bg-card);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 32px;
+      box-shadow: var(--shadow-sm);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .policy-card:hover {
+      border-color: var(--border-highlight);
+    }
+
+    .policy-card h2 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 16px;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--accent-glow);
+      color: var(--accent-primary);
+      font-size: 0.9rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .policy-card h3 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 22px 0 10px;
+      color: var(--text-primary);
+    }
+
+    .policy-card p {
+      color: var(--text-secondary);
+      margin-bottom: 14px;
+      font-size: 0.96rem;
+    }
+
+    .policy-card ul, .policy-card ol {
+      margin: 12px 0 18px 24px;
+      color: var(--text-secondary);
+    }
+
+    .policy-card li {
+      margin-bottom: 8px;
+      font-size: 0.95rem;
+    }
+
+    .policy-card strong {
+      color: var(--text-primary);
+    }
+
+    /* Highlight Banner / Notice */
+    .notice-box {
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      margin: 18px 0;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      font-size: 0.92rem;
+    }
+
+    .notice-info {
+      background: rgba(99, 102, 241, 0.08);
+      border: 1px solid rgba(99, 102, 241, 0.25);
+      color: var(--text-secondary);
+    }
+
+    .notice-success {
+      background: var(--success-bg);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+      color: var(--text-secondary);
+    }
+
+    .notice-warning {
+      background: var(--warning-bg);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      color: var(--text-secondary);
+    }
+
+    .notice-danger {
+      background: var(--danger-bg);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--text-secondary);
+    }
+
+    .notice-icon {
+      font-size: 1.25rem;
+      line-height: 1;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* Data Safety Table */
+    .table-container {
+      width: 100%;
+      overflow-x: auto;
+      margin: 20px 0;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+    }
+
+    table.data-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    table.data-table th {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      font-weight: 600;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      white-space: nowrap;
+    }
+
+    table.data-table td {
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      vertical-align: top;
+    }
+
+    table.data-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    table.data-table tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+
+    .badge-collected {
+      background-color: rgba(99, 102, 241, 0.15);
+      color: var(--accent-primary);
+    }
+
+    .badge-optional {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: var(--warning);
+    }
+
+    .badge-encrypted {
+      background-color: var(--success-bg);
+      color: var(--success);
+    }
+
+    /* Third-party SDK Cards */
+    .sdk-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin: 18px 0;
+    }
+
+    .sdk-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sdk-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 8px;
+    }
+
+    .sdk-name {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--text-primary);
+    }
+
+    .sdk-purpose {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .sdk-link {
+      font-size: 0.8rem;
+      color: var(--accent-primary);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 600;
+    }
+
+    .sdk-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Account & Data Deletion interactive form */
+    .deletion-box {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.08) 0%, rgba(139, 92, 246, 0.05) 100%);
+      border: 1px solid var(--border-highlight);
+      border-radius: var(--radius-md);
+      padding: 24px;
+      margin: 20px 0;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-primary);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-primary);
+    }
+
+    /* Footer */
+    footer.site-footer {
+      border-top: 1px solid var(--border-color);
+      background-color: var(--bg-secondary);
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 0.875rem;
+      color: var(--text-muted);
+    }
+
+    .footer-container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+
+    .footer-links a:hover {
+      color: var(--accent-primary);
+    }
+
+    /* Print styling */
+    @media print {
+      body {
+        background: white !important;
+        color: black !important;
+      }
+      header.site-header, .toc-sidebar, .theme-toggle, .btn, .ambient-glow {
+        display: none !important;
+      }
+      .main-layout {
+        grid-template-columns: 1fr !important;
+        padding: 0 !important;
+      }
+      .policy-card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="ambient-glow"></div>
+
+  <!-- Header -->
+  <header class="site-header">
+    <div class="header-container">
+      <a href="#" class="brand" aria-label="Skudo Home">
+        <div class="app-icon">S</div>
+        <div class="brand-text">
+          <span class="brand-title">Skudo</span>
+          <span class="brand-sub">com.prem.skudo</span>
+        </div>
+      </a>
+
+      <div class="header-actions">
+        <button id="themeToggle" class="theme-toggle" title="Toggle Theme" aria-label="Toggle dark/light theme">
+          <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+        <a href="#data-deletion" class="btn btn-secondary" id="quickDeleteBtn">Data Deletion</a>
+        <button onclick="window.print()" class="btn btn-primary" id="printBtn">Print Policy</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Header -->
+  <section class="hero-section">
+    <div class="hero-container">
+      <div class="status-badge">
+        <span class="dot"></span>
+        <span>Google Play Policy &amp; Data Safety Compliant</span>
+      </div>
+      <h1 class="page-title">Privacy Policy for Skudo</h1>
+      <p class="hero-description">
+        We value your privacy. This comprehensive privacy policy explains what information we collect, how it is used and secured, and how you can exercise complete control over your personal data.
+      </p>
+
+      <div class="meta-cards">
+        <div class="meta-chip">
+          <span>Application:</span>
+          <strong>Skudo (Sudoku)</strong>
+        </div>
+        <div class="meta-chip">
+          <span>Package Name:</span>
+          <strong>com.prem.skudo</strong>
+        </div>
+        <div class="meta-chip">
+          <span>Target Platform:</span>
+          <strong>Android (Google Play)</strong>
+        </div>
+        <div class="meta-chip">
+          <span>Effective Date:</span>
+          <strong>September 4, 2026</strong>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Layout -->
+  <main class="main-layout">
+
+    <!-- Table of Contents -->
+    <aside class="toc-sidebar" aria-label="Table of contents">
+      <div class="toc-box">
+        <div class="toc-title">Policy Navigation</div>
+        <ul class="toc-list" id="tocList">
+          <li><a href="#overview" class="toc-link">1. Overview &amp; Identity</a></li>
+          <li><a href="#summary" class="toc-link">2. Quick Summary (TL;DR)</a></li>
+          <li><a href="#data-collected" class="toc-link">3. Information We Collect</a></li>
+          <li><a href="#data-usage" class="toc-link">4. How We Use Data</a></li>
+          <li><a href="#data-safety" class="toc-link">5. Play Console Data Safety</a></li>
+          <li><a href="#device-permissions" class="toc-link">6. Device Permissions</a></li>
+          <li><a href="#third-parties" class="toc-link">7. Third-Party Services</a></li>
+          <li><a href="#data-retention" class="toc-link">8. Data Retention</a></li>
+          <li><a href="#data-deletion" class="toc-link">9. Account &amp; Data Deletion</a></li>
+          <li><a href="#children" class="toc-link">10. Children's Privacy</a></li>
+          <li><a href="#security" class="toc-link">11. Security &amp; Encryption</a></li>
+          <li><a href="#user-rights" class="toc-link">12. GDPR &amp; CCPA Rights</a></li>
+          <li><a href="#contact" class="toc-link">13. Contact Developer</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Content Sections -->
+    <div class="content-area">
+
+      <!-- Section 1: Overview -->
+      <section id="overview" class="policy-card">
+        <h2><span class="section-num">1</span> Overview &amp; Developer Identity</h2>
+        <p>
+          Welcome to <strong>Skudo</strong>, a modern, feature-rich Sudoku puzzle game application created by <strong>Prem Kalyan</strong> ("we", "us", or "our"). This Privacy Policy applies to the Android application Skudo, registered under the application package ID <code>com.prem.skudo</code> on Google Play.
+        </p>
+        <p>
+          We are committed to maintaining the highest standards of data integrity, transparency, and user privacy in compliance with:
+        </p>
+        <ul>
+          <li><strong>Google Play Developer Distribution Agreement and User Data Policies</strong> (including Data Safety requirements and Target SDK standards).</li>
+          <li><strong>General Data Protection Regulation (GDPR)</strong> for users in the European Economic Area (EEA) and the United Kingdom.</li>
+          <li><strong>California Consumer Privacy Act (CCPA) / California Privacy Rights Act (CPRA)</strong>.</li>
+        </ul>
+      </section>
+
+      <!-- Section 2: Summary -->
+      <section id="summary" class="policy-card">
+        <h2><span class="section-num">2</span> Quick Summary (TL;DR)</h2>
+        <div class="notice-box notice-info">
+          <span class="notice-icon">ℹ️</span>
+          <div>
+            <strong>Core Privacy Highlights:</strong>
+            <ul style="margin: 8px 0 0 16px;">
+              <li><strong>You can play offline:</strong> Skudo does not require an account to enjoy basic Sudoku gameplay. Offline play stores puzzles locally on your device.</li>
+              <li><strong>Optional Google Sign-In:</strong> You may sign in with Google to enable cloud sync, preserve your level/coins/gems, and restore purchases across devices.</li>
+              <li><strong>We NEVER sell your data:</strong> Your information is never sold, leased, or rented to data brokers or advertising exchanges.</li>
+              <li><strong>Direct Data Deletion:</strong> You can delete your account and all associated cloud data at any time directly through the app or by submitting a web request on this page.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Information We Collect -->
+      <section id="data-collected" class="policy-card">
+        <h2><span class="section-num">3</span> Information We Collect</h2>
+        <p>
+          Depending on whether you play as a guest or sign in with an account, we collect the following categories of data:
+        </p>
+
+        <h3>A. Account Information (Optional via Google Sign-In)</h3>
+        <p>
+          If you choose to sign in to sync your progress across devices, we use <strong>Firebase Authentication</strong> and <strong>Google Identity Services</strong>. We collect:
+        </p>
+        <ul>
+          <li><strong>Display Name:</strong> To personalize your user profile and leaderboard ranking.</li>
+          <li><strong>Email Address:</strong> Associated with your Google account for authentication and account identity.</li>
+          <li><strong>Google User ID:</strong> A unique cryptographic identifier supplied by Google to associate your game data.</li>
+          <li><strong>Profile Photo URL:</strong> (Optional) Displayed in your in-game profile header if provided by Google.</li>
+        </ul>
+
+        <h3>B. Gameplay &amp; Progress Data (Cloud Firestore)</h3>
+        <p>
+          When signed in, your game progression is synchronized with <strong>Google Cloud Firestore</strong> to prevent progress loss:
+        </p>
+        <ul>
+          <li><strong>Puzzles &amp; Statistics:</strong> Puzzles completed, win streaks, best solve times, mistakes made, and difficulty level records.</li>
+          <li><strong>Player Progression:</strong> XP (experience points), player level, earned rank, in-game coins, and gems.</li>
+          <li><strong>Inventory &amp; Purchases:</strong> Unlocked game themes, available hints, and shop inventory items.</li>
+          <li><strong>Saved Game State:</strong> Board layout, pencil notes, and elapsed timer of an in-progress game so you can resume anytime.</li>
+        </ul>
+
+        <h3>C. Device &amp; Technical Information</h3>
+        <p>
+          Standard diagnostics required by the Android operating system and Google Play Services:
+        </p>
+        <ul>
+          <li>Android OS version, device model, app version (e.g., Version 3.0, API Level 36), and system language for proper localization and rendering.</li>
+        </ul>
+      </section>
+
+      <!-- Section 4: Data Usage -->
+      <section id="data-usage" class="policy-card">
+        <h2><span class="section-num">4</span> How We Use Your Information</h2>
+        <p>We process your data solely for legitimate, user-facing operational purposes:</p>
+        <ul>
+          <li><strong>Game Functionality:</strong> Generating Sudoku boards, validating inputs, tracking hints, calculating mistake limits, and persisting saved games.</li>
+          <li><strong>Cross-Device Synchronization:</strong> Backing up your achievements, gems, unlocked themes, and stats to your linked Google account so you never lose progress.</li>
+          <li><strong>Authentication &amp; Security:</strong> Verifying your identity through Google Sign-In, protecting against fraudulent account actions, and maintaining database integrity.</li>
+          <li><strong>Haptic Feedback:</strong> Enhancing the interactive gameplay feel (vibrations on cell taps or mistakes) via device hardware.</li>
+        </ul>
+      </section>
+
+      <!-- Section 5: Play Console Data Safety -->
+      <section id="data-safety" class="policy-card">
+        <h2><span class="section-num">5</span> Google Play Data Safety Matrix</h2>
+        <p>
+          The table below reflects our exact disclosures submitted to the <strong>Google Play Console Data Safety</strong> section:
+        </p>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Data Category</th>
+                <th>Data Types</th>
+                <th>Collection Status</th>
+                <th>Purpose</th>
+                <th>Encrypted in Transit</th>
+                <th>Deletion Available</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Personal Info</strong></td>
+                <td>Name, Email, Google User ID</td>
+                <td><span class="badge badge-optional">Optional (Google Sign-In)</span></td>
+                <td>Account Management &amp; Cloud Sync</td>
+                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>App Activity</strong></td>
+                <td>Gameplay stats, solved puzzles, scores, streak</td>
+                <td><span class="badge badge-collected">Collected</span></td>
+                <td>Game functionality &amp; analytics</td>
+                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Financial / Virtual Items</strong></td>
+                <td>In-game coins, gems balance, purchased themes</td>
+                <td><span class="badge badge-optional">Optional (When signed in)</span></td>
+                <td>Virtual shop &amp; inventory tracking</td>
+                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td><strong>Device / Other IDs</strong></td>
+                <td>Firebase Instance ID, OS version</td>
+                <td><span class="badge badge-collected">Collected</span></td>
+                <td>App stability &amp; service delivery</td>
+                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
+                <td>Yes</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Section 6: Device Permissions -->
+      <section id="device-permissions" class="policy-card">
+        <h2><span class="section-num">6</span> Device Permissions</h2>
+        <p>
+          Skudo adheres to the principle of least privilege. The app requests only the minimum permissions necessary for gameplay:
+        </p>
+
+        <div class="table-container">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Permission</th>
+                <th>Level</th>
+                <th>Purpose &amp; Usage</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>android.permission.VIBRATE</code></td>
+                <td>Normal</td>
+                <td>Used strictly to provide haptic feedback when you tap numbers, toggle notes, or enter a number. You can toggle haptics on or off in the game settings.</td>
+              </tr>
+              <tr>
+                <td><code>android.permission.INTERNET</code></td>
+                <td>Normal</td>
+                <td>Required to securely communicate with Firebase Authentication and Google Cloud Firestore for profile sync.</td>
+              </tr>
+              <tr>
+                <td><code>android.permission.ACCESS_NETWORK_STATE</code></td>
+                <td>Normal</td>
+                <td>Detects network availability so the app can gracefully queue updates locally when playing offline.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="notice-box notice-success">
+          <span class="notice-icon">🔒</span>
+          <div>
+            <strong>No Sensitive Permissions:</strong> Skudo does <em>NOT</em> access your location (GPS), camera, microphone, contacts, SMS, or external storage files.
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 7: Third-Party Services -->
+      <section id="third-parties" class="policy-card">
+        <h2><span class="section-num">7</span> Third-Party Service Providers</h2>
+        <p>
+          We rely on trusted third-party infrastructure services provided by Google LLC. These providers process data according to strict confidentiality agreements:
+        </p>
+
+        <div class="sdk-grid">
+          <div class="sdk-card">
+            <div>
+              <div class="sdk-header">
+                <span class="sdk-name">Google Play Services</span>
+              </div>
+              <p class="sdk-purpose">Provides core Android API functionality, Google Play billing/verification, and security integrity.</p>
+            </div>
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Google Privacy Policy &rarr;</a>
+          </div>
+
+          <div class="sdk-card">
+            <div>
+              <div class="sdk-header">
+                <span class="sdk-name">Firebase Authentication</span>
+              </div>
+              <p class="sdk-purpose">Handles secure, federated Google Sign-In authentication without storing passwords on our servers.</p>
+            </div>
+            <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Firebase Privacy Policy &rarr;</a>
+          </div>
+
+          <div class="sdk-card">
+            <div>
+              <div class="sdk-header">
+                <span class="sdk-name">Google Cloud Firestore</span>
+              </div>
+              <p class="sdk-purpose">NoSQL cloud database that securely stores and synchronizes user profiles, puzzle progress, and shop inventories.</p>
+            </div>
+            <a href="https://cloud.google.com/security/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Google Cloud Privacy &rarr;</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 8: Data Retention -->
+      <section id="data-retention" class="policy-card">
+        <h2><span class="section-num">8</span> Data Retention</h2>
+        <p>
+          We retain your data only as long as necessary to provide you with the game service:
+        </p>
+        <ul>
+          <li><strong>Local Data:</strong> Stored in your device's local storage (Room Database and DataStore). You can clear this anytime by clearing the app's cache/storage or uninstalling the app.</li>
+          <li><strong>Cloud Data:</strong> Retained in Firebase Firestore as long as your account is active. If your account is inactive for more than 24 months, or upon receiving your deletion request, your profile and game records are permanently deleted.</li>
+        </ul>
+      </section>
+
+      <!-- Section 9: Account & Data Deletion (Play Store Requirement) -->
+      <section id="data-deletion" class="policy-card">
+        <h2><span class="section-num">9</span> Account &amp; Data Deletion Policy</h2>
+        <p>
+          In full accordance with Google Play's <strong>Account Deletion and Data Safety Requirements</strong>, any user who creates an account via Google Sign-In has the right to request the permanent deletion of their account and all associated personal data.
+        </p>
+
+        <div class="notice-box notice-warning">
+          <span class="notice-icon">⚠️</span>
+          <div>
+            <strong>What happens when you delete your account:</strong>
+            <ul style="margin: 6px 0 0 16px;">
+              <li>Your Firebase Authentication record is deleted.</li>
+              <li>Your Cloud Firestore user profile, stats, level, XP, coins, and gems are permanently purged.</li>
+              <li>All unlocked themes and hint inventories will be revoked and cannot be recovered.</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>How to Request Account &amp; Data Deletion</h3>
+        <p>You may initiate deletion via either of the following methods:</p>
+
+        <ol>
+          <li>
+            <strong>In-App Deletion:</strong>
+            Navigate to the in-game Settings/Profile menu in Skudo, tap <strong>"Sign Out &amp; Clear Cloud Data"</strong>.
+          </li>
+          <li>
+            <strong>Web-Based Request (Google Play Mandated):</strong>
+            Use the deletion form below or email us directly at <a href="mailto:premkalyan2727@gmail.com" style="color: var(--accent-primary);">premkalyan2727@gmail.com</a> with the subject <code>Skudo Data Deletion Request</code>.
+          </li>
+        </ol>
+
+        <!-- Interactive Deletion Form -->
+        <div class="deletion-box">
+          <h3 style="margin-top: 0; margin-bottom: 12px;">Submit Web Data Deletion Request</h3>
+          <p style="font-size: 0.88rem; margin-bottom: 16px;">
+            Enter the Google Email address linked with your Skudo game account. This will compose a pre-formatted deletion request directly to the developer:
+          </p>
+          <div class="form-group">
+            <label class="form-label" for="userEmailInput">Your Registered Google Email:</label>
+            <input type="email" id="userEmailInput" class="form-input" placeholder="e.g. yourname@gmail.com" required>
+          </div>
+          <button type="button" class="btn btn-primary" id="submitDeletionBtn">
+            Generate Deletion Request Email
+          </button>
+          <p id="deletionSuccessMsg" style="display: none; color: var(--success); font-size: 0.85rem; margin-top: 10px; font-weight: 600;">
+            ✓ Email client opened! Send the email to finalize your deletion request. Deletion is completed within 30 days.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 10: Children's Privacy -->
+      <section id="children" class="policy-card">
+        <h2><span class="section-num">10</span> Children's Privacy (COPPA)</h2>
+        <p>
+          Skudo is a general audience logic puzzle game designed for users of all ages. We do not knowingly collect, solicit, or store personal information from children under the age of 13 (or under 16 in the European Union) without verifiable parental consent.
+        </p>
+        <p>
+          If you are a parent or guardian and become aware that your child has provided us with personal information via Google Sign-In without your consent, please contact us immediately at <a href="mailto:premkalyan2727@gmail.com" style="color: var(--accent-primary);">premkalyan2727@gmail.com</a>. Upon verification, we will promptly delete such information from our servers.
+        </p>
+      </section>
+
+      <!-- Section 11: Security & Encryption -->
+      <section id="security" class="policy-card">
+        <h2><span class="section-num">11</span> Security &amp; Encryption Standards</h2>
+        <p>
+          We implement rigorous technical and organizational security measures to protect your information:
+        </p>
+        <ul>
+          <li><strong>Encryption in Transit:</strong> All network communication between the Skudo app and Firebase/Google Cloud is encrypted using industry-standard <strong>Transport Layer Security (TLS/HTTPS)</strong> protocols.</li>
+          <li><strong>Database Access Rules:</strong> Firebase Firestore security rules restrict database access so that each player can only view and update their own authorized player profile.</li>
+          <li><strong>No Plaintext Passwords:</strong> We do not manage, store, or have access to passwords; authentication is delegated entirely to Google Identity Services.</li>
+        </ul>
+      </section>
+
+      <!-- Section 12: User Rights -->
+      <section id="user-rights" class="policy-card">
+        <h2><span class="section-num">12</span> Your Rights (GDPR &amp; CCPA/CPRA)</h2>
+        <p>Under applicable global privacy laws, you possess the following rights regarding your personal data:</p>
+        <ul>
+          <li><strong>Right to Access / Know:</strong> Request a copy of the personal data we hold about you.</li>
+          <li><strong>Right to Rectification:</strong> Request correction of inaccurate personal data.</li>
+          <li><strong>Right to Erasure ("Right to be Forgotten"):</strong> Request that we delete your personal and gameplay data.</li>
+          <li><strong>Right to Data Portability:</strong> Obtain your data in a structured, machine-readable format.</li>
+          <li><strong>Right to Non-Discrimination:</strong> We will never discriminate against you (e.g., by denying gameplay) for exercising your privacy rights.</li>
+        </ul>
+        <p>To exercise any of these rights, please contact our support team at <a href="mailto:premkalyan2727@gmail.com" style="color: var(--accent-primary);">premkalyan2727@gmail.com</a>.</p>
+      </section>
+
+      <!-- Section 13: Contact Developer -->
+      <section id="contact" class="policy-card">
+        <h2><span class="section-num">13</span> Developer Contact Information</h2>
+        <p>
+          If you have any questions, concerns, or requests regarding this Privacy Policy or your personal data in Skudo, please contact:
+        </p>
+
+        <div style="background-color: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 20px; margin: 16px 0;">
+          <p style="margin-bottom: 6px;"><strong>Developer Name:</strong> Prem Kalyan</p>
+          <p style="margin-bottom: 6px;"><strong>App:</strong> Skudo (com.prem.skudo)</p>
+          <p style="margin-bottom: 12px;"><strong>Contact Email:</strong> <code style="color: var(--accent-primary); font-size: 0.95rem;">premkalyan2727@gmail.com</code></p>
+          <button type="button" class="btn btn-secondary" id="copyEmailBtn" style="font-size: 0.8125rem;">
+            📋 Copy Contact Email
+          </button>
+        </div>
+
+        <p style="font-size: 0.88rem; color: var(--text-muted);">
+          We strive to acknowledge and resolve all privacy inquiries and data deletion requests within <strong>48 hours</strong>, and in all events within 30 days as required by law.
+        </p>
+      </section>
+
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="footer-container">
+      <div class="footer-links">
+        <a href="#overview">Overview</a>
+        <a href="#data-safety">Data Safety</a>
+        <a href="#data-deletion">Account Deletion</a>
+        <a href="#children">Children's Privacy</a>
+        <a href="#contact">Contact</a>
+      </div>
+      <p>&copy; 2026 Prem Kalyan. All rights reserved. Skudo is a registered Android application.</p>
+      <p style="font-size: 0.78rem; color: var(--text-muted);">
+        Last updated: September 4, 2026. This policy meets or exceeds all current Google Play Developer Policy standards.
+      </p>
+    </div>
+  </footer>
+
+  <!-- Interactive JavaScript -->
+  <script>
+    // Theme Toggle Handler
+    const themeToggle = document.getElementById('themeToggle');
+    const themeIcon = document.getElementById('themeIcon');
+    const root = document.documentElement;
+
+    function setTheme(theme) {
+      if (theme === 'light') {
+        root.setAttribute('data-theme', 'light');
+        themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+      } else {
+        root.removeAttribute('data-theme');
+        themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+      }
+      localStorage.setItem('skudo_privacy_theme', theme);
+    }
+
+    const savedTheme = localStorage.getItem('skudo_privacy_theme') || 
+      (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+    setTheme(savedTheme);
+
+    themeToggle.addEventListener('click', () => {
+      const current = root.getAttribute('data-theme') === 'light' ? 'light' : 'dark';
+      setTheme(current === 'light' ? 'dark' : 'light');
+    });
+
+    // Copy Email Handler
+    const copyEmailBtn = document.getElementById('copyEmailBtn');
+    copyEmailBtn.addEventListener('click', () => {
+      navigator.clipboard.writeText('premkalyan2727@gmail.com').then(() => {
+        const origText = copyEmailBtn.innerText;
+        copyEmailBtn.innerText = '✓ Copied to Clipboard!';
+        setTimeout(() => {
+          copyEmailBtn.innerText = origText;
+        }, 2500);
+      });
+    });
+
+    // Data Deletion Request Mailto Generator
+    const submitDeletionBtn = document.getElementById('submitDeletionBtn');
+    const userEmailInput = document.getElementById('userEmailInput');
+    const deletionSuccessMsg = document.getElementById('deletionSuccessMsg');
+
+    submitDeletionBtn.addEventListener('click', () => {
+      const email = userEmailInput.value.trim();
+      const subject = encodeURIComponent('[Skudo] Account & Data Deletion Request');
+      const body = encodeURIComponent(
+        `Dear Skudo Support,\n\n` +
+        `I am formally requesting the permanent deletion of my Skudo game account and all associated cloud data in accordance with Google Play data safety policies.\n\n` +
+        `Account Details:\n` +
+        `- App: Skudo (com.prem.skudo)\n` +
+        `- Registered Google Account Email: ${email || '[Enter your email here]'}\n\n` +
+        `Please confirm once all Firestore profile records, authentication credentials, and gameplay statistics have been purged.\n\n` +
+        `Thank you.`
+      );
+
+      window.location.href = `mailto:premkalyan2727@gmail.com?subject=${subject}&body=${body}`;
+      deletionSuccessMsg.style.display = 'block';
+    });
+
+    // Scroll spy for Table of Contents
+    const sections = document.querySelectorAll('.policy-card');
+    const navLinks = document.querySelectorAll('.toc-link');
+
+    window.addEventListener('scroll', () => {
+      let currentSectionId = '';
+      sections.forEach(section => {
+        const top = section.offsetTop - 140;
+        if (window.scrollY >= top) {
+          currentSectionId = section.getAttribute('id');
+        }
+      });
+
+      navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === `#${currentSectionId}`) {
+          link.classList.add('active');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
