@@ -199,19 +199,13 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
 
-        val currentState = _uiState.value
-        if (currentState.selectedNumber != null) {
-            // Digit-First Input: Apply selected number to this cell
-            _uiState.update { it.copy(selectedCell = row to col) }
-            enterNumber(currentState.selectedNumber)
-            // Clear digit-first selection so dragging doesn't auto-fill other cells
-            _uiState.update { it.copy(selectedNumber = null) }
-        } else {
-            // Cell-First Input: Just select the cell
-            _uiState.update { 
-                val newState = it.copy(selectedCell = row to col)
-                updateHighlights(newState)
-            }
+        _uiState.update { 
+            val cellValue = it.puzzle[row, col].value
+            val newState = it.copy(
+                selectedCell = row to col,
+                selectedNumber = cellValue
+            )
+            updateHighlights(newState)
         }
         // No autoSave on cell selection — saves happen on actual moves (enterNumber, erase, hint, undo/redo)
     }
@@ -223,10 +217,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             // Cell-First: If a cell is selected, fill it
             enterNumber(num)
         } else {
-            // Digit-First: Just select the number for subsequent taps
             _uiState.update { 
                 val newNum = if (it.selectedNumber == num) null else num
-                it.copy(selectedNumber = newNum) 
+                val newState = it.copy(selectedNumber = newNum) 
+                updateHighlights(newState)
             }
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
         }
@@ -234,15 +228,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun onCellLongClick(row: Int, col: Int) {
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
-        val activeNum = _uiState.value.selectedNumber
-        if (activeNum != null) {
-            // Long press in digit-first mode: Enter as note
-            updateNotes(row, col, activeNum)
-            hapticManager.vibrate(com.prem.skudo.utils.HapticType.MEDIUM)
-        } else {
-            // Otherwise, just select (or could toggle notes mode)
-            selectCell(row, col)
-        }
+        selectCell(row, col)
     }
 
     fun toggleNotesMode() {
@@ -497,7 +483,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 } else cell
             }
         }
-        val newState = state.copy(puzzle = SudokuBoard(newCells))
+        val newState = state.copy(puzzle = SudokuBoard(newCells), selectedNumber = value)
         return validateAndHighlight(newState)
     }
 
@@ -517,13 +503,15 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     private fun updateHighlights(state: GameState): GameState {
-        val (selR, selC) = state.selectedCell ?: return state
-        val selectedValue = state.puzzle[selR, selC].value
+        val selectedCell = state.selectedCell
+        val selR = selectedCell?.first
+        val selC = selectedCell?.second
+        val selectedValue = if (selectedCell != null) state.puzzle[selR!!, selC!!].value else state.selectedNumber
 
         val newCells = state.puzzle.cells.mapIndexed { ri, rowList ->
             rowList.mapIndexed { ci, cell ->
-                val newHighlighted = ri == selR && ci == selC
-                val newRelated = state.highlightRelated && (ri == selR || ci == selC || (ri / 3 == selR / 3 && ci / 3 == selC / 3))
+                val newHighlighted = selectedCell != null && ri == selR && ci == selC
+                val newRelated = selectedCell != null && state.highlightRelated && (ri == selR || ci == selC || (ri / 3 == selR!! / 3 && ci / 3 == selC!! / 3))
                 val newMatching = state.highlightIdentical && selectedValue != null && cell.value == selectedValue
 
                 if (cell.isHighlighted == newHighlighted && 
