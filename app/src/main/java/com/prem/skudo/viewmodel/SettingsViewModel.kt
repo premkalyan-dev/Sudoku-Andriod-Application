@@ -18,10 +18,10 @@ data class SettingsState(
     val themeMode: String = "SYSTEM",
     val accentColor: String = "Cyan",
     val boardStyle: String = "Modern",
-    val soundEffects: Boolean = true,
+    val soundEffects: Boolean = false,
     val backgroundMusic: Boolean = false,
     val vibration: Boolean = true,
-    val buttonSounds: Boolean = true,
+    val buttonSounds: Boolean = false,
     val dailyReminder: Boolean = false,
     val achievementReminder: Boolean = false,
     val eventReminder: Boolean = false

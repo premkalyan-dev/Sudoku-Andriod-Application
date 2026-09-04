@@ -51,10 +51,10 @@ class SettingsRepository(private val context: Context) {
     val gridThickness: Flow<Float> = context.settingsDataStore.data.map { it[GRID_THICKNESS] ?: 1.0f }
     val animationSpeed: Flow<Float> = context.settingsDataStore.data.map { it[ANIMATION_SPEED] ?: 1.0f }
 
-    val soundEffects: Flow<Boolean> = context.settingsDataStore.data.map { it[SOUND_EFFECTS] ?: true }
+    val soundEffects: Flow<Boolean> = context.settingsDataStore.data.map { it[SOUND_EFFECTS] ?: false }
     val backgroundMusic: Flow<Boolean> = context.settingsDataStore.data.map { it[BACKGROUND_MUSIC] ?: false }
     val vibration: Flow<Boolean> = context.settingsDataStore.data.map { it[VIBRATION] ?: true }
-    val buttonSounds: Flow<Boolean> = context.settingsDataStore.data.map { it[BUTTON_SOUNDS] ?: true }
+    val buttonSounds: Flow<Boolean> = context.settingsDataStore.data.map { it[BUTTON_SOUNDS] ?: false }
     val volumeLevel: Flow<Float> = context.settingsDataStore.data.map { it[VOLUME_LEVEL] ?: 1.0f }
 
     val dailyReminder: Flow<Boolean> = context.settingsDataStore.data.map { it[DAILY_CHALLENGE_REMINDER] ?: false }

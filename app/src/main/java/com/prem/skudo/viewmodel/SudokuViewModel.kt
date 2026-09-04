@@ -251,7 +251,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             return
         }
 
-        soundManager.playSound("place_number")
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
 
         if (currentState.isNotesMode) {
@@ -271,7 +270,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 
                 if (!actuallyCorrect && state.autoCheck) {
                     newMistakes++
-                    soundManager.playSound("mistake")
                     hapticManager.vibrate(com.prem.skudo.utils.HapticType.STRONG)
                     if (state.maxMistakes in 1..newMistakes) {
                         timerManager.stop()
@@ -364,7 +362,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         val newBoxes = if (isBoxComplete) state.lastCompletedBoxes + boxIndex else state.lastCompletedBoxes
 
         if (isRowComplete || isColComplete || isBoxComplete) {
-            soundManager.playSound("completion")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.MEDIUM)
             
             val animatingCells = puzzle.cells.mapIndexed { ri, rowList ->
@@ -424,7 +421,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         if (state.isPaused || state.isGameOver) return
         val (row, col) = state.selectedCell ?: return
         if (!state.puzzle[row, col].isClue) {
-            soundManager.playSound("erase")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
             saveToUndoStack()
             _uiState.update { currentState ->
@@ -439,7 +435,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         val state = _uiState.value
         if (state.isPaused || state.isGameOver || state.hintsRemaining <= 0) return
         
-        soundManager.playSound("hint")
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.MEDIUM)
         
         val emptyCells = mutableListOf<Pair<Int, Int>>()
@@ -542,7 +537,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         if (isSolved) {
             timerManager.stop()
             val finalTime = _timerSeconds.value
-            soundManager.playSound("victory")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.SUCCESS)
             
             _uiState.update { it.copy(isGameOver = true, isVictory = true, isLoading = true, timerSeconds = finalTime) }
@@ -645,7 +639,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun undo() {
         if (undoStack.isNotEmpty()) {
-            soundManager.playSound("undo")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
             redoStack.addLast(_uiState.value.puzzle)
             val previousBoard = undoStack.removeLast()
@@ -659,7 +652,6 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun redo() {
         if (redoStack.isNotEmpty()) {
-            soundManager.playSound("redo")
             hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
             undoStack.addLast(_uiState.value.puzzle)
             val nextBoard = redoStack.removeLast()
