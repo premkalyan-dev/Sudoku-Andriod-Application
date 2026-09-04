@@ -148,9 +148,11 @@ class MainActivity : ComponentActivity() {
                             
                             SudokuHomeScreen(
                                 onStartGame = { difficulty, isDaily ->
+                                    gameViewModel.dismissAllDialogs()
                                     navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=false")
                                 },
                                 onContinueGame = { difficulty, isDaily ->
+                                    gameViewModel.dismissAllDialogs()
                                     navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=true")
                                 },
                                 onDailyChallenge = { navController.navigate("daily_challenge") },

@@ -86,7 +86,18 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun forceStartNewGame(difficulty: Difficulty, isDaily: Boolean = false) {
-        _uiState.update { it.copy(isLoading = true, difficulty = difficulty, isDailyChallenge = isDaily, showStartNewConfirmation = false) }
+        _uiState.update { 
+            it.copy(
+                isLoading = true, 
+                difficulty = difficulty, 
+                isDailyChallenge = isDaily, 
+                showStartNewConfirmation = false,
+                showLeaveDialog = false,
+                showRestartConfirmation = false,
+                showDiscardConfirmation = false,
+                isPaused = false
+            ) 
+        }
         _timerSeconds.value = 0
         viewModelScope.launch(Dispatchers.Default) {
             val (puzzle, solution) = generator.generate(difficulty)
@@ -115,7 +126,16 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun continueGame(difficulty: Difficulty, isDaily: Boolean = false) {
-        _uiState.update { it.copy(isLoading = true, showStartNewConfirmation = false) }
+        _uiState.update { 
+            it.copy(
+                isLoading = true, 
+                showStartNewConfirmation = false,
+                showLeaveDialog = false,
+                showRestartConfirmation = false,
+                showDiscardConfirmation = false,
+                isPaused = false
+            ) 
+        }
         _timerSeconds.value = 0
         viewModelScope.launch(Dispatchers.IO) {
             val saved = repository.getSavedGame(difficulty, isDaily) ?: return@launch
@@ -172,7 +192,28 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun saveAndExit() {
         timerManager.stop()
         autoSave(immediate = true)
-        // Navigation is handled by the screen
+        _uiState.update { 
+            it.copy(
+                showLeaveDialog = false,
+                showRestartConfirmation = false,
+                showDiscardConfirmation = false,
+                showStartNewConfirmation = false,
+                isPaused = false
+            ) 
+        }
+    }
+
+    fun dismissAllDialogs() {
+        _uiState.update { 
+            it.copy(
+                showLeaveDialog = false,
+                showRestartConfirmation = false,
+                showDiscardConfirmation = false,
+                showStartNewConfirmation = false,
+                showContinueDialog = false,
+                isPaused = false
+            ) 
+        }
     }
 
     fun discardGame() {
@@ -183,7 +224,14 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         timerManager.stop()
         viewModelScope.launch {
             repository.deleteSavedGame(_uiState.value.difficulty, _uiState.value.isDailyChallenge)
-            _uiState.update { it.copy(isGameOver = true, showDiscardConfirmation = false, showLeaveDialog = false) }
+            _uiState.update { 
+                it.copy(
+                    isGameOver = true, 
+                    showDiscardConfirmation = false, 
+                    showLeaveDialog = false,
+                    isPaused = false
+                ) 
+            }
         }
     }
 
