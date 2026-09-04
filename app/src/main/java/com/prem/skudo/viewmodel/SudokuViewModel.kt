@@ -197,6 +197,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
     fun selectCell(row: Int, col: Int) {
         if (_uiState.value.isPaused || _uiState.value.isGameOver) return
+        if (_uiState.value.selectedCell == row to col) return
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.LIGHT)
 
         _uiState.update { 

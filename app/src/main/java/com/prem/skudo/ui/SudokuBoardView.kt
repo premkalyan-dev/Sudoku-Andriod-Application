@@ -2,6 +2,8 @@ package com.prem.skudo.ui
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
@@ -10,6 +12,8 @@ import androidx.compose.runtime.key
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.input.pointer.PointerEventPass
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import com.prem.skudo.model.SudokuBoard
 
@@ -41,7 +45,36 @@ fun SudokuBoardView(
             .padding(4.dp)
     ) {
         Column(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(onCellClick) {
+                    awaitEachGesture {
+                        val down = awaitFirstDown(pass = PointerEventPass.Initial)
+                        val pointerId = down.id
+                        val w = size.width.toFloat()
+                        val h = size.height.toFloat()
+                        if (w > 0f && h > 0f) {
+                            val startCol = (down.position.x / w * 9f).toInt().coerceIn(0, 8)
+                            val startRow = (down.position.y / h * 9f).toInt().coerceIn(0, 8)
+                            var lastCell = startRow to startCol
+                            onCellClick(startRow, startCol)
+
+                            while (true) {
+                                val event = awaitPointerEvent(pass = PointerEventPass.Initial)
+                                val change = event.changes.firstOrNull { it.id == pointerId } ?: event.changes.firstOrNull() ?: break
+                                if (!change.pressed) break
+
+                                val curCol = (change.position.x / w * 9f).toInt().coerceIn(0, 8)
+                                val curRow = (change.position.y / h * 9f).toInt().coerceIn(0, 8)
+                                val curCell = curRow to curCol
+                                if (curCell != lastCell) {
+                                    lastCell = curCell
+                                    onCellClick(curRow, curCol)
+                                }
+                            }
+                        }
+                    }
+                },
             verticalArrangement = Arrangement.spacedBy(3.dp)
         ) {
             for (rowGroup in 0 until 3) {
