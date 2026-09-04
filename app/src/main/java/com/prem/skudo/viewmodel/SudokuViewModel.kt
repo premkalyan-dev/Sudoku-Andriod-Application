@@ -204,6 +204,8 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             // Digit-First Input: Apply selected number to this cell
             _uiState.update { it.copy(selectedCell = row to col) }
             enterNumber(currentState.selectedNumber)
+            // Clear digit-first selection so dragging doesn't auto-fill other cells
+            _uiState.update { it.copy(selectedNumber = null) }
         } else {
             // Cell-First Input: Just select the cell
             _uiState.update { 
