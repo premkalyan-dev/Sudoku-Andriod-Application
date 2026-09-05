@@ -166,55 +166,7 @@ fun ShopScreen(
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // Game Themes Section
-            SectionHeader(
-                title = "Game Themes",
-                subtitle = "Personalize your board styling & colors"
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            val themes = listOf("Ocean", "Forest", "Neon", "Gold")
-
-            // 2x2 Grid via Columns of Rows
-            Column(verticalArrangement = Arrangement.spacedBy(14.dp)) {
-                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    ShopItemCard(
-                        title = themes[0],
-                        price = 1000,
-                        isUnlocked = uiState.unlockedThemes.contains(themes[0]),
-                        onClick = { viewModel.buyTheme(themes[0]) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ShopItemCard(
-                        title = themes[1],
-                        price = 1000,
-                        isUnlocked = uiState.unlockedThemes.contains(themes[1]),
-                        onClick = { viewModel.buyTheme(themes[1]) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-                Row(horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                    ShopItemCard(
-                        title = themes[2],
-                        price = 1000,
-                        isUnlocked = uiState.unlockedThemes.contains(themes[2]),
-                        onClick = { viewModel.buyTheme(themes[2]) },
-                        modifier = Modifier.weight(1f)
-                    )
-                    ShopItemCard(
-                        title = themes[3],
-                        price = 1000,
-                        isUnlocked = uiState.unlockedThemes.contains(themes[3]),
-                        onClick = { viewModel.buyTheme(themes[3]) },
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
         }
     }
 }
@@ -383,23 +335,6 @@ fun HintPackCard(
     }
 }
 
-@Composable
-fun SectionHeader(title: String, subtitle: String) {
-    Column {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.titleMedium.copy(fontSize = 18.sp),
-            fontWeight = FontWeight.ExtraBold,
-            color = MaterialTheme.colorScheme.onBackground
-        )
-        Spacer(modifier = Modifier.height(2.dp))
-        Text(
-            text = subtitle,
-            style = MaterialTheme.typography.bodySmall,
-            color = TextMuted
-        )
-    }
-}
 
 @Composable
 fun CurrencyBadge(amount: Long, icon: ImageVector, color: Color) {
@@ -438,118 +373,4 @@ fun CurrencyBadge(amount: Long, icon: ImageVector, color: Color) {
     }
 }
 
-@Composable
-fun ShopItemCard(
-    title: String,
-    price: Int,
-    isUnlocked: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val cardColor = if (isUnlocked) {
-        MaterialTheme.colorScheme.surfaceVariant
-    } else {
-        MaterialTheme.colorScheme.surface
-    }
 
-    Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(enabled = !isUnlocked) { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = if (isUnlocked) 1.dp else 3.dp,
-            pressedElevation = 6.dp
-        ),
-        colors = CardDefaults.cardColors(containerColor = cardColor),
-        border = BorderStroke(
-            1.dp,
-            if (isUnlocked) EasyGreen.copy(alpha = 0.5f)
-            else MaterialTheme.colorScheme.outlineVariant
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 18.dp, horizontal = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            val badgeColor = if (isUnlocked) EasyGreen else MaterialTheme.colorScheme.primary
-            
-            // Icon Badge
-            Box(
-                modifier = Modifier
-                    .size(58.dp)
-                    .shadow(4.dp, CircleShape, spotColor = badgeColor.copy(alpha = 0.35f))
-                    .background(badgeColor.copy(alpha = 0.14f), CircleShape)
-                    .border(1.5.dp, badgeColor.copy(alpha = 0.35f), CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = if (isUnlocked) Icons.Default.Check else Icons.Default.Lock,
-                    contentDescription = null,
-                    tint = badgeColor,
-                    modifier = Modifier.size(26.dp)
-                )
-            }
-
-            Spacer(modifier = Modifier.height(14.dp))
-
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Bottom CTA: Price Chip vs Unlocked Badge
-            if (isUnlocked) {
-                Surface(
-                    color = EasyGreen.copy(alpha = 0.16f),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, EasyGreen.copy(alpha = 0.4f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "UNLOCKED",
-                            color = EasyGreen,
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 11.sp,
-                            letterSpacing = 0.5.sp
-                        )
-                    }
-                }
-            } else {
-                Surface(
-                    color = AccentGold.copy(alpha = 0.15f),
-                    shape = RoundedCornerShape(12.dp),
-                    border = BorderStroke(1.dp, AccentGold.copy(alpha = 0.45f))
-                ) {
-                    Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.MonetizationOn,
-                            contentDescription = null,
-                            tint = AccentGold,
-                            modifier = Modifier.size(15.dp)
-                        )
-                        Spacer(modifier = Modifier.width(5.dp))
-                        Text(
-                            text = price.toString(),
-                            fontWeight = FontWeight.ExtraBold,
-                            fontSize = 13.sp,
-                            color = AccentGold
-                        )
-                    }
-                }
-            }
-        }
-    }
-}
