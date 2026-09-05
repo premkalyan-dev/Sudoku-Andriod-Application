@@ -36,6 +36,7 @@ data class GameState(
     val showStartNewConfirmation: Boolean = false,
     val showRestartConfirmation: Boolean = false,
     val userGems: Long = 0,
+    val userCoins: Long = 0,
     
     // Resume Metadata
     val lastPlayedTimestamp: Long = 0,

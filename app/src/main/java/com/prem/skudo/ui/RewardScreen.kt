@@ -234,9 +234,6 @@ fun RewardContent(
             ) {
                 RewardCard("+${state.xpEarned}", stringResource(R.string.xp), Icons.Default.AddCircle, MaterialTheme.colorScheme.primary)
                 RewardCard("+${state.coinsEarned}", stringResource(R.string.coins), Icons.Default.MonetizationOn, AccentGold)
-                if (state.gemsEarned > 0) {
-                    RewardCard("+${state.gemsEarned}", stringResource(R.string.gems), Icons.Default.Diamond, Color(0xFF00CED1))
-                }
             }
             
             if (state.unlockedAchievements.isNotEmpty()) {

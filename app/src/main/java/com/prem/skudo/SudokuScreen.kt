@@ -118,7 +118,7 @@ fun SudokuGameScreen(
         onHint = viewModel::useHint,
         onNumberClick = viewModel::selectNumber,
         onNewGameClick = { viewModel.startNewGame(uiState.difficulty) },
-        onContinueWithGems = viewModel::continueWithGems,
+        onContinueWithCoins = viewModel::continueWithCoins,
         onGameOver = viewModel::gameOver
     )
 }
@@ -148,7 +148,7 @@ fun SudokuScreenContent(
     onHint: () -> Unit,
     onNumberClick: (Int) -> Unit,
     onNewGameClick: () -> Unit,
-    onContinueWithGems: () -> Unit,
+    onContinueWithCoins: () -> Unit,
     onGameOver: () -> Unit
 ) {
     // Intercept back press to show Pause Menu instead of quitting
@@ -279,8 +279,8 @@ fun SudokuScreenContent(
 
         if (uiState.showContinueDialog) {
             ContinueGameDialog(
-                gems = uiState.userGems,
-                onContinue = onContinueWithGems,
+                coins = uiState.userCoins,
+                onContinue = onContinueWithCoins,
                 onCancel = onGameOver
             )
         }
@@ -793,7 +793,7 @@ fun DiscardConfirmationDialog(
 
 @Composable
 fun ContinueGameDialog(
-    gems: Long,
+    coins: Long,
     onContinue: () -> Unit,
     onCancel: () -> Unit,
 ) {
@@ -802,20 +802,20 @@ fun ContinueGameDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         shape = RoundedCornerShape(32.dp),
         icon = { 
-            Surface(color = GemCyan.copy(alpha = 0.1f), shape = CircleShape, modifier = Modifier.size(80.dp)) {
+            Surface(color = AccentGold.copy(alpha = 0.12f), shape = CircleShape, modifier = Modifier.size(80.dp)) {
                 Box(contentAlignment = Alignment.Center) {
-                    Icon(Icons.Default.Diamond, null, Modifier.size(40.dp), GemCyan)
+                    Icon(Icons.Default.MonetizationOn, null, Modifier.size(40.dp), AccentGold)
                 }
             }
         },
         title = { Text(stringResource(R.string.out_of_mistakes), fontWeight = FontWeight.Black, textAlign = TextAlign.Center) },
         text = {
             Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.continue_with_gems), textAlign = TextAlign.Center)
+                Text(stringResource(R.string.continue_with_coins), textAlign = TextAlign.Center)
                 Spacer(Modifier.height(12.dp))
                 Surface(color = MaterialTheme.colorScheme.surfaceVariant, shape = RoundedCornerShape(8.dp)) {
                     Text(
-                        text = stringResource(R.string.you_have_gems, gems.toInt()),
+                        text = stringResource(R.string.you_have_coins, coins.toInt()),
                         modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Bold
@@ -826,12 +826,12 @@ fun ContinueGameDialog(
         confirmButton = {
             Button(
                 onClick = onContinue,
-                enabled = gems >= 1,
+                enabled = coins >= 100,
                 modifier = Modifier.fillMaxWidth().height(56.dp),
                 shape = RoundedCornerShape(16.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = GemCyan)
+                colors = ButtonDefaults.buttonColors(containerColor = AccentGold)
             ) {
-                Text(stringResource(R.string.continue_1_gem), color = Color.White, fontWeight = FontWeight.Black)
+                Text(stringResource(R.string.continue_100_coins), color = Color.White, fontWeight = FontWeight.Black)
             }
         },
         dismissButton = {
@@ -899,7 +899,7 @@ fun SudokuScreenPreview() {
             onHint = {},
             onNumberClick = {},
             onNewGameClick = {},
-            onContinueWithGems = {},
+            onContinueWithCoins = {},
             onGameOver = {},
             onRestartGame = {},
             onConfirmRestart = {},

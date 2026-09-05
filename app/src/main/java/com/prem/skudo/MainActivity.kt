@@ -352,7 +352,7 @@ fun OnboardingPageContent(page: Int) {
         )
         else -> OnboardingData(
             "Daily Rewards",
-            "Complete daily challenges to earn gems, unlock avatars, and climb the ranks.",
+            "Complete daily challenges to earn coins, unlock avatars, and climb the ranks.",
             Icons.Default.EmojiEvents,
             EasyGreen
         )
@@ -569,31 +569,20 @@ fun SudokuHomeScreen(
                 )
             }
 
-            // Resources (Coins & Gems)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(24.dp))
-                    .padding(horizontal = 16.dp, vertical = 8.dp)
-                    .shadow(2.dp, RoundedCornerShape(24.dp))
+            // Resources (Coins)
+            Surface(
+                color = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(24.dp),
+                shadowElevation = 2.dp
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                ) {
                     Icon(Icons.Default.MonetizationOn, null, Modifier.size(20.dp), AccentGold)
-                    Spacer(Modifier.width(4.dp))
+                    Spacer(Modifier.width(6.dp))
                     Text(
                         text = profile.coins.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-                Box(modifier = Modifier.width(1.dp).height(16.dp).background(TextMuted.copy(alpha = 0.3f)))
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(Icons.Default.Diamond, null, Modifier.size(20.dp), MaterialTheme.colorScheme.primary)
-                    Spacer(Modifier.width(4.dp))
-                    Text(
-                        text = profile.gems.toString(),
                         fontWeight = FontWeight.Bold,
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onSurface

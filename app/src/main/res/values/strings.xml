@@ -25,9 +25,9 @@
     <string name="cancel">CANCEL</string>
     <string name="mistakes">Mistakes: </string>
     <string name="out_of_mistakes">OUT OF MISTAKES!</string>
-    <string name="continue_with_gems">Would you like to continue for 1 Gem?</string>
-    <string name="you_have_gems">You have %1$d Gems</string>
-    <string name="continue_1_gem">CONTINUE (1 Gem)</string>
+    <string name="continue_with_coins">Would you like to continue for 100 Coins?</string>
+    <string name="you_have_coins">You have %1$d Coins</string>
+    <string name="continue_100_coins">CONTINUE (100 Coins)</string>
     <string name="no_thanks">NO THANKS</string>
     <string name="game_over">GAME OVER</string>
     <string name="game_over_mistakes">You\'ve used all %1$d mistakes.</string>

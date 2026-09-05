@@ -79,13 +79,7 @@ object LevelManager {
         isDailyChallenge: Boolean = false,
         mistakes: Int = 0,
         hintsUsed: Int = 0
-    ): Long {
-        if (!isWin) return 0
-        var gems = 0L
-        if (isDailyChallenge) gems += 2
-        if (mistakes == 0 && hintsUsed == 0) gems += 1
-        return gems
-    }
+    ): Long = 0L
 
     fun getTitleForLevel(level: Int): String {
         return when {

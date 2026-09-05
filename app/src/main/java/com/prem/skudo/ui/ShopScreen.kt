@@ -75,10 +75,8 @@ fun ShopScreen(
                 },
                 actions = {
                     CurrencyBadge(uiState.hints.toLong(), Icons.Default.Lightbulb, EasyGreen)
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(6.dp))
                     CurrencyBadge(uiState.coins, Icons.Default.MonetizationOn, AccentGold)
-                    Spacer(modifier = Modifier.width(4.dp))
-                    CurrencyBadge(uiState.gems, Icons.Default.Diamond, GemCyan)
                     Spacer(modifier = Modifier.width(8.dp))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

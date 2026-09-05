@@ -213,14 +213,10 @@ fun HomeProfileHeader(
             )
         }
         
-        Column(horizontalAlignment = Alignment.End, modifier = Modifier.padding(start = 8.dp)) {
+        Box(modifier = Modifier.padding(start = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(Icons.Default.MonetizationOn, null, Modifier.size(16.dp), AccentGold)
                 Text(" ${profile.coins}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp)
-            }
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(Icons.Default.Diamond, null, Modifier.size(16.dp), MaterialTheme.colorScheme.primary)
-                Text(" ${profile.gems}", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface, fontSize = 12.sp)
             }
         }
     }

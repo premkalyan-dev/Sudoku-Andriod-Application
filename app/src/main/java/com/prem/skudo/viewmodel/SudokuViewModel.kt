@@ -64,7 +64,12 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }.launchIn(viewModelScope)
 
         userRepository.userProfile.onEach { profile ->
-            _uiState.update { it.copy(userGems = profile?.gems ?: 0) }
+            _uiState.update { 
+                it.copy(
+                    userGems = profile?.gems ?: 0,
+                    userCoins = profile?.coins ?: 0
+                ) 
+            }
         }.launchIn(viewModelScope)
     }
 
@@ -770,15 +775,17 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    fun continueWithGems() {
+    fun continueWithCoins() {
         val currentState = _uiState.value
-        if (currentState.userGems >= 1) {
+        val cost = 100L
+        if (currentState.userCoins >= cost) {
             viewModelScope.launch {
                 val economyRepository = com.prem.skudo.repository.EconomyRepository(getApplication())
-                val success = economyRepository.spendGems(1)
+                val success = economyRepository.spendCoins(cost)
                 if (success) {
                     _uiState.update { 
                         it.copy(
+                            userCoins = it.userCoins - cost,
                             mistakes = it.mistakes - 1,
                             isGameOver = false,
                             showContinueDialog = false
@@ -789,6 +796,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 }
             }
         }
+    }
+
+    fun continueWithGems() {
+        continueWithCoins()
     }
 
     fun gameOver() {

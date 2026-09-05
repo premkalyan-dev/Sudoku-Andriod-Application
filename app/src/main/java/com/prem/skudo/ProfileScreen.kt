@@ -87,10 +87,13 @@ fun ProfileScreen(
             Spacer(modifier = Modifier.height(24.dp))
             
             // Resources Section
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                ResourceCard(Modifier.weight(1f), "Coins", profile.coins.toString(), Icons.Default.MonetizationOn, Color(0xFFFFD700))
-                ResourceCard(Modifier.weight(1f), "Gems", profile.gems.toString(), Icons.Default.Diamond, Color(0xFF00CED1))
-            }
+            ResourceCard(
+                modifier = Modifier.fillMaxWidth(),
+                title = "Coins",
+                value = profile.coins.toString(),
+                icon = Icons.Default.MonetizationOn,
+                color = Color(0xFFFFD700)
+            )
             
             Spacer(modifier = Modifier.height(24.dp))
 
