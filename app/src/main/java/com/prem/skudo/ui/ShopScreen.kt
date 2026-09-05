@@ -232,23 +232,19 @@ fun HintPackCard(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = if (pack.isBestValue) 10.dp else 0.dp)
-                .clip(RoundedCornerShape(20.dp)),
+                .padding(top = if (pack.isBestValue) 10.dp else 0.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = if (pack.isBestValue) {
-                    MaterialTheme.colorScheme.surface
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
-                }
+                containerColor = MaterialTheme.colorScheme.surface
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = if (pack.isBestValue) 4.dp else 1.dp
+                defaultElevation = if (pack.isBestValue) 4.dp else 2.dp,
+                pressedElevation = 4.dp
             ),
             border = if (pack.isBestValue) {
                 BorderStroke(2.dp, MaterialTheme.colorScheme.primary)
             } else {
-                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f))
+                BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant)
             }
         ) {
             Column(
@@ -269,8 +265,8 @@ fun HintPackCard(
                             Icon(
                                 imageVector = pack.headerIcon,
                                 contentDescription = null,
-                                tint = if (pack.isBestValue) MaterialTheme.colorScheme.primary else AccentGold,
-                                modifier = Modifier.size(18.dp)
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(20.dp)
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
@@ -451,7 +447,7 @@ fun ShopItemCard(
     modifier: Modifier = Modifier
 ) {
     val cardColor = if (isUnlocked) {
-        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.35f)
+        MaterialTheme.colorScheme.surfaceVariant
     } else {
         MaterialTheme.colorScheme.surface
     }
@@ -459,7 +455,6 @@ fun ShopItemCard(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
             .clickable(enabled = !isUnlocked) { onClick() },
         shape = RoundedCornerShape(20.dp),
         elevation = CardDefaults.cardElevation(
@@ -469,8 +464,8 @@ fun ShopItemCard(
         colors = CardDefaults.cardColors(containerColor = cardColor),
         border = BorderStroke(
             1.dp,
-            if (isUnlocked) EasyGreen.copy(alpha = 0.3f)
-            else MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.25f)
+            if (isUnlocked) EasyGreen.copy(alpha = 0.5f)
+            else MaterialTheme.colorScheme.outlineVariant
         )
     ) {
         Column(

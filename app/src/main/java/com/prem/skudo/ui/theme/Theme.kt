@@ -38,10 +38,13 @@ fun SudokuTheme(
             tertiary = AccentGold,
             background = Color(0xFF000814),
             surface = Color(0xFF001229),
+            surfaceVariant = Color(0xFF0D1B2A),
+            outlineVariant = Color(0xFF1B2A4A),
             onPrimary = Color.White,
             onSecondary = Color.White,
             onBackground = Color(0xFFE9ECEF),
             onSurface = Color(0xFFE9ECEF),
+            onSurfaceVariant = Color(0xFFADB5BD),
             error = WrongRed
         )
     } else {
@@ -51,10 +54,13 @@ fun SudokuTheme(
             tertiary = AccentGold,
             background = LightBackground,
             surface = LightSurface,
+            surfaceVariant = LightCard,
+            outlineVariant = Color(0xFFE2E8F0),
             onPrimary = Color.White,
             onSecondary = Color.White,
             onBackground = TextDark,
             onSurface = TextDark,
+            onSurfaceVariant = TextMuted,
             error = WrongRed
         )
     }
