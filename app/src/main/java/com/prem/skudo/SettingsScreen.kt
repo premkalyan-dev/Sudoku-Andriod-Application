@@ -1,5 +1,7 @@
 package com.prem.skudo
 
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -9,6 +11,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.VolumeUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -17,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -91,19 +95,11 @@ fun SettingsScreen(
                     }
                     settingsViewModel.updateAccentColor(nextColor)
                 }
-                SettingsClickable("Board Style", settingsState.boardStyle, Icons.Default.GridOn) {
-                    val nextStyle = when(settingsState.boardStyle) {
-                        "Modern" -> "Classic"
-                        "Classic" -> "Glass"
-                        else -> "Modern"
-                    }
-                    settingsViewModel.updateBoardStyle(nextStyle)
-                }
             }
 
             // Audio Section
             SettingsSection("Audio") {
-                SettingsToggle("Sound Effects", "Game interaction sounds", settingsState.soundEffects, Icons.Default.VolumeUp) {
+                SettingsToggle("Sound Effects", "Game interaction sounds", settingsState.soundEffects, Icons.AutoMirrored.Filled.VolumeUp) {
                     settingsViewModel.updateSoundEffects(it)
                 }
                 SettingsToggle("Vibration", "Haptic feedback on actions", settingsState.vibration, Icons.Default.Vibration) {
@@ -114,26 +110,18 @@ fun SettingsScreen(
                 }
             }
 
-            // Notifications Section
-            SettingsSection("Notifications") {
-                SettingsToggle("Daily Reminder", "Remind me to play daily challenge", settingsState.dailyReminder, Icons.Default.Notifications) {
-                    settingsViewModel.updateDailyReminder(it)
-                }
-                SettingsToggle("Achievement Reminder", "Notify when achievements are unlocked", settingsState.achievementReminder, Icons.Default.EmojiEvents) {
-                    settingsViewModel.updateAchievementReminder(it)
-                }
-            }
-
             // Language Section
             SettingsSection("Language") {
                 SettingsClickable("Language", "English", Icons.Default.Language) {}
             }
 
             // About Section
+            val context = LocalContext.current
             SettingsSection("About") {
-                SettingsClickable("Privacy Policy", null, Icons.Default.PrivacyTip) {}
-                SettingsClickable("Terms of Service", null, Icons.Default.Description) {}
-                SettingsClickable("Open Source Licenses", null, Icons.Default.Info) {}
+                SettingsClickable("Privacy Policy", null, Icons.Default.PrivacyTip) {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://fabulous-crostata-6b5805.netlify.app/"))
+                    context.startActivity(intent)
+                }
                 
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),

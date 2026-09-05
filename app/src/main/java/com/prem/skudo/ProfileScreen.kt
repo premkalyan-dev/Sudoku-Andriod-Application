@@ -110,32 +110,7 @@ fun ProfileScreen(
             // Account Info
             AccountInfoCard(profile)
 
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            if (uiState.currentUser != null) {
-                Button(
-                    onClick = { homeViewModel.signOut() },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text("SIGN OUT", fontWeight = FontWeight.Bold)
-                }
-            } else {
-                Button(
-                    onClick = { homeViewModel.signIn() },
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.White),
-                    shape = RoundedCornerShape(16.dp),
-                    border = BorderStroke(1.dp, Color.LightGray)
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.AccountCircle, null, tint = Color.Gray)
-                        Spacer(Modifier.width(12.dp))
-                        Text("Sign in with Google", color = Color.Black, fontWeight = FontWeight.Bold)
-                    }
-                }
-            }
+
         }
     }
     
@@ -344,21 +319,8 @@ fun AccountInfoCard(profile: UserProfile) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text("Account Information", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
             Spacer(modifier = Modifier.height(8.dp))
-            if (profile.cloudUserId != null) {
-                InfoRow("Status", "Linked to Google")
-                InfoRow("Email", profile.email ?: "N/A")
-            } else {
-                InfoRow("Status", "Offline Profile")
-                InfoRow("User ID", profile.userId.take(8) + "...")
-            }
-            InfoRow("Account Type", if (profile.cloudUserId == null) "Guest Account" else "Cloud Account")
+            InfoRow("User ID", profile.userId.take(8) + "...")
             InfoRow("Join Date", java.text.SimpleDateFormat("MMM dd, yyyy", java.util.Locale.getDefault()).format(java.util.Date(profile.joinedDate)))
-            if (profile.lastSyncAt != null) {
-                val syncDate = java.text.SimpleDateFormat("MMM dd, HH:mm", java.util.Locale.getDefault()).format(java.util.Date(profile.lastSyncAt))
-                InfoRow("Last Sync", syncDate)
-            } else if (profile.cloudUserId != null) {
-                InfoRow("Last Sync", "Pending First Sync")
-            }
         }
     }
 }
