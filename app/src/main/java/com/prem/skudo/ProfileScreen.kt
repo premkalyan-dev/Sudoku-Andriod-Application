@@ -88,11 +88,11 @@ fun ProfileScreen(
             
             // Resources Section
             ResourceCard(
-                modifier = Modifier.fillMaxWidth(),
-                title = "Coins",
-                value = profile.coins.toString(),
-                icon = Icons.Default.MonetizationOn,
-                color = Color(0xFFFFD700)
+                Modifier.fillMaxWidth(),
+                "Coins",
+                profile.coins.toString(),
+                Icons.Default.MonetizationOn,
+                Color(0xFFFFD700)
             )
             
             Spacer(modifier = Modifier.height(24.dp))
