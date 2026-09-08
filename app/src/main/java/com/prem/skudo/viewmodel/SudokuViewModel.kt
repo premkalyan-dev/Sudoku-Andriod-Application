@@ -497,39 +497,114 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     fun useHint() {
         val state = _uiState.value
         if (state.isPaused || state.isGameOver || state.hintsRemaining <= 0) return
-        
+
         hapticManager.vibrate(com.prem.skudo.utils.HapticType.MEDIUM)
-        
-        val emptyCells = mutableListOf<Pair<Int, Int>>()
+
+        // A real hint deduces a value logically instead of revealing a random answer.
+        // Compute the remaining legal candidates for every empty cell, then:
+        //   1. Prefer a "naked single" — a cell with only one option left. That is a
+        //      genuine deduction the player can follow step-by-step.
+        //   2. Otherwise pick the most-constrained cell (fewest candidates) and fill in
+        //      its correct value as a weakest-link hint.
+        val candidates = computeCandidates(state)
+
+        var bestCell: Pair<Int, Int>? = null
+        var bestCandidateCount = Int.MAX_VALUE
+        var bestCompletesLine = false
+
         for (r in 0..8) {
             for (c in 0..8) {
                 val cell = state.puzzle[r, c]
-                if (!cell.isClue && (cell.value == null || cell.value != state.solution[r, c].value)) {
-                    emptyCells.add(r to c)
+                if (cell.isClue || cell.value != null) continue
+                val cands = candidates[r][c]
+                if (cands.isEmpty()) continue
+
+                val completesLine = cands.size == 1 && completesLine(state, r, c)
+                val isBetter = when {
+                    bestCell == null -> true
+                    cands.size < bestCandidateCount -> true
+                    cands.size == bestCandidateCount && completesLine && !bestCompletesLine -> true
+                    else -> false
+                }
+                if (isBetter) {
+                    bestCell = r to c
+                    bestCandidateCount = cands.size
+                    bestCompletesLine = completesLine
                 }
             }
         }
 
-        if (emptyCells.isNotEmpty()) {
-            val (r, c) = emptyCells.random()
-            saveToUndoStack()
-            
-            viewModelScope.launch {
-                val profile = userRepository.getOrCreateProfile()
-                if (profile.hints > 0) {
-                    val updatedProfile = profile.copy(hints = profile.hints - 1)
-                    AppDatabase.getDatabase(getApplication<Application>()).userDao().updateProfile(updatedProfile)
+        val (r, c) = bestCell ?: return
+        val value = state.solution[r, c].value
+
+        saveToUndoStack()
+
+        viewModelScope.launch {
+            val profile = userRepository.getOrCreateProfile()
+            if (profile.hints > 0) {
+                val updatedProfile = profile.copy(hints = profile.hints - 1)
+                AppDatabase.getDatabase(getApplication<Application>()).userDao().updateProfile(updatedProfile)
+            }
+        }
+
+        _uiState.update { currentState ->
+            val updatedHints = currentState.copy(hintsRemaining = currentState.hintsRemaining - 1)
+            val newState = updateCellInternal(updatedHints, r, c, value)
+            checkCompletions(newState, r, c)
+        }
+        checkVictory()
+        autoSave()
+    }
+
+    /**
+     * Computes the set of still-legal values for every cell based on the current
+     * board state (row, column and box constraints). Filled cells return an empty set.
+     */
+    private fun computeCandidates(state: GameState): Array<Array<MutableSet<Int>>> {
+        val board = state.puzzle
+        val candidates = Array(9) { Array(9) { mutableSetOf(1, 2, 3, 4, 5, 6, 7, 8, 9) } }
+        for (r in 0..8) {
+            for (c in 0..8) {
+                val value = board[r, c].value
+                if (value != null) {
+                    candidates[r][c].clear()
+                } else {
+                    val set = candidates[r][c]
+                    for (i in 0..8) {
+                        board[r, i].value?.let { set.remove(it) }
+                        board[i, c].value?.let { set.remove(it) }
+                    }
+                    val boxRow = (r / 3) * 3
+                    val boxCol = (c / 3) * 3
+                    for (dr in 0..2) {
+                        for (dc in 0..2) {
+                            board[boxRow + dr, boxCol + dc].value?.let { set.remove(it) }
+                        }
+                    }
                 }
             }
-
-            _uiState.update { currentState ->
-                val updatedHints = currentState.copy(hintsRemaining = currentState.hintsRemaining - 1)
-                val newState = updateCellInternal(updatedHints, r, c, currentState.solution[r, c].value)
-                checkCompletions(newState, r, c)
-            }
-            checkVictory()
-            autoSave()
         }
+        return candidates
+    }
+
+    /**
+     * Returns true when placing this cell's single candidate would finish a row,
+     * column or box — a satisfying, easy-to-spot deduction for the player.
+     */
+    private fun completesLine(state: GameState, row: Int, col: Int): Boolean {
+        val board = state.puzzle
+        val rowFull = (0..8).all { ci -> ci == col || board[row, ci].value != null }
+        if (rowFull) return true
+        val colFull = (0..8).all { ri -> ri == row || board[ri, col].value != null }
+        if (colFull) return true
+        val boxRow = (row / 3) * 3
+        val boxCol = (col / 3) * 3
+        val boxFull = (0..2).all { dr ->
+            (0..2).all { dc ->
+                (dr == row - boxRow && dc == col - boxCol) || board[boxRow + dr, boxCol + dc].value != null
+            }
+        }
+        return boxFull
     }
 
     private fun updateCellInternal(state: GameState, row: Int, col: Int, value: Int?): GameState {
