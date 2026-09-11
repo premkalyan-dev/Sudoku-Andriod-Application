@@ -189,7 +189,7 @@ fun SudokuScreenContent(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            val boardSize = minOf(maxWidth, (maxHeight - 240.dp).coerceAtLeast(200.dp))
+            val boardSize = minOf(maxWidth, (maxHeight - 270.dp).coerceAtLeast(200.dp))
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -249,7 +249,8 @@ fun SudokuScreenContent(
                     isNotesMode = uiState.isNotesMode
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                // Leave comfortable breathing space in the footer
+                Spacer(modifier = Modifier.height(36.dp))
             }
         }
 
@@ -312,14 +313,22 @@ fun PremiumGameHeader(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        IconButton(
+        Surface(
             onClick = onBack,
-            modifier = Modifier
-                .size(44.dp)
-                .background(MaterialTheme.colorScheme.surface, CircleShape)
-                .shadow(2.dp, CircleShape)
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 2.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
+            modifier = Modifier.size(44.dp)
         ) {
-            Icon(Icons.AutoMirrored.Filled.ArrowBack, null, tint = MaterialTheme.colorScheme.onSurface)
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.AutoMirrored.Filled.ArrowBack,
+                    contentDescription = "Back",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
 
         // Timer Section in a Floating Card
@@ -327,6 +336,7 @@ fun PremiumGameHeader(
             color = MaterialTheme.colorScheme.surface,
             shape = RoundedCornerShape(24.dp),
             shadowElevation = 2.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
             modifier = Modifier.padding(horizontal = 8.dp)
         ) {
             Row(
@@ -350,14 +360,22 @@ fun PremiumGameHeader(
             }
         }
 
-        IconButton(
+        Surface(
             onClick = onPauseToggle,
-            modifier = Modifier
-                .size(44.dp)
-                .background(MaterialTheme.colorScheme.surface, CircleShape)
-                .shadow(2.dp, CircleShape)
+            shape = CircleShape,
+            color = MaterialTheme.colorScheme.surface,
+            shadowElevation = 2.dp,
+            border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f)),
+            modifier = Modifier.size(44.dp)
         ) {
-            Icon(Icons.Default.Settings, null, tint = MaterialTheme.colorScheme.onSurface)
+            Box(contentAlignment = Alignment.Center) {
+                Icon(
+                    Icons.Default.Settings,
+                    contentDescription = "Settings",
+                    tint = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
         }
     }
 }
