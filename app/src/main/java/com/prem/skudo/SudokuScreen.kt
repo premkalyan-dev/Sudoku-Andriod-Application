@@ -189,7 +189,7 @@ fun SudokuScreenContent(
                 .padding(padding)
                 .padding(horizontal = 16.dp)
         ) {
-            val boardSize = minOf(maxWidth, (maxHeight - 270.dp).coerceAtLeast(200.dp))
+            val boardSize = minOf(maxWidth, (maxHeight - 290.dp).coerceAtLeast(200.dp))
 
             Column(
                 modifier = Modifier.fillMaxSize(),
@@ -249,8 +249,8 @@ fun SudokuScreenContent(
                     isNotesMode = uiState.isNotesMode
                 )
 
-                // Leave comfortable breathing space in the footer
-                Spacer(modifier = Modifier.height(36.dp))
+                // Generous breathing space in the footer
+                Spacer(modifier = Modifier.height(56.dp))
             }
         }
 
