@@ -183,66 +183,74 @@ fun SudokuScreenContent(
     Scaffold(
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
-        Column(
+        BoxWithConstraints(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 16.dp)
         ) {
-            // 1. Premium Header (Compact & Elegant)
-            PremiumGameHeader(
-                timerSeconds = timerSeconds,
-                onBack = { onPause() },
-                onPauseToggle = onPause
-            )
+            val boardSize = minOf(maxWidth, (maxHeight - 240.dp).coerceAtLeast(200.dp))
 
-            // 2. Main Stats Bar (Difficulty & Mistakes)
-            GameStatsBar(
-                difficulty = uiState.difficulty,
-                mistakes = uiState.mistakes,
-                maxMistakes = uiState.maxMistakes
-            )
-
-            // 3. Sudoku Board (The Hero)
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                contentAlignment = Alignment.Center
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                SudokuBoardView(
-                    board = uiState.puzzle,
-                    onCellClick = onCellClick,
-                    onCellLongClick = onCellLongClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .aspectRatio(1f),
-                    boardStyle = uiState.boardStyle
+                // 1. Premium Header (Compact & Elegant)
+                PremiumGameHeader(
+                    timerSeconds = timerSeconds,
+                    onBack = { onPause() },
+                    onPauseToggle = onPause
                 )
+
+                // 2. Main Stats Bar (Difficulty & Mistakes)
+                GameStatsBar(
+                    difficulty = uiState.difficulty,
+                    mistakes = uiState.mistakes,
+                    maxMistakes = uiState.maxMistakes
+                )
+
+                // Flexible spacer to balance top space and center the board
+                Spacer(modifier = Modifier.weight(1f))
+
+                // 3. Sudoku Board (The Hero - Vertically Centered)
+                Box(
+                    modifier = Modifier.size(boardSize),
+                    contentAlignment = Alignment.Center
+                ) {
+                    SudokuBoardView(
+                        board = uiState.puzzle,
+                        onCellClick = onCellClick,
+                        onCellLongClick = onCellLongClick,
+                        modifier = Modifier.fillMaxSize(),
+                        boardStyle = uiState.boardStyle
+                    )
+                }
+
+                // Flexible spacer to balance bottom space and center the board
+                Spacer(modifier = Modifier.weight(1f))
+
+                // 4. Compact Control Actions (Positioned for easy thumb reach)
+                ActionButtonsRow(
+                    isNotesMode = uiState.isNotesMode,
+                    hintsRemaining = uiState.hintsRemaining,
+                    onUndo = onUndo,
+                    onErase = onErase,
+                    onToggleNotes = onToggleNotes,
+                    onHint = onHint
+                )
+
+                Spacer(modifier = Modifier.height(6.dp))
+
+                // 5. Premium Number Pad
+                PremiumNumberPad(
+                    board = uiState.puzzle,
+                    selectedNumber = uiState.selectedNumber,
+                    onNumberClick = onNumberClick,
+                    isNotesMode = uiState.isNotesMode
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
             }
-
-            // 4. Compact Control Actions
-            ActionButtonsRow(
-                isNotesMode = uiState.isNotesMode,
-                hintsRemaining = uiState.hintsRemaining,
-                onUndo = onUndo,
-                onErase = onErase,
-                onToggleNotes = onToggleNotes,
-                onHint = onHint
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // 5. Premium Number Pad
-            PremiumNumberPad(
-                board = uiState.puzzle,
-                selectedNumber = uiState.selectedNumber,
-                onNumberClick = onNumberClick,
-                isNotesMode = uiState.isNotesMode
-            )
-
-            Spacer(modifier = Modifier.height(12.dp))
         }
 
         // Overlays
