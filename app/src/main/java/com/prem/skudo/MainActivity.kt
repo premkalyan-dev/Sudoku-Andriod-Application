@@ -545,67 +545,85 @@ fun SudokuHomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Top Header Section: Profile (Left) - Resources (Center) - Shop (Right)
+        // Top Header Section: Capsule on Right (Coins - Shop - Settings)
         Row(
-            modifier = Modifier
-                .fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.End
         ) {
-            // Profile Button (Circle)
             val profile = uiState.userProfile ?: com.prem.skudo.database.UserProfile()
-            Surface(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .clickable { onViewProfile() },
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
-            ) {
-                UserAvatar(
-                    avatarId = profile.avatarId,
-                    imageUrl = profile.photoUrl,
-                    size = 50.dp
-                )
-            }
 
-            // Resources (Coins)
             Surface(
                 color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(24.dp),
-                shadowElevation = 2.dp
+                shape = RoundedCornerShape(26.dp),
+                shadowElevation = 3.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
             ) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp)
+                    modifier = Modifier.padding(start = 14.dp, end = 6.dp, top = 4.dp, bottom = 4.dp)
                 ) {
-                    Icon(Icons.Default.MonetizationOn, null, Modifier.size(20.dp), AccentGold)
-                    Spacer(Modifier.width(6.dp))
-                    Text(
-                        text = profile.coins.toString(),
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                }
-            }
+                    // Coins
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(end = 10.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.MonetizationOn,
+                            contentDescription = "Coins",
+                            tint = AccentGold,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(5.dp))
+                        Text(
+                            text = profile.coins.toString(),
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                    }
 
-            // Shop Button (Circle)
-            Surface(
-                modifier = Modifier
-                    .size(50.dp)
-                    .clip(CircleShape)
-                    .clickable { onShop() },
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        Icons.Default.ShoppingCart,
-                        contentDescription = "Shop",
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(24.dp)
+                    // Divider
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(18.dp)
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
                     )
+
+                    // Shop Button
+                    IconButton(
+                        onClick = onShop,
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.ShoppingCart,
+                            contentDescription = "Shop",
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    // Divider
+                    Box(
+                        modifier = Modifier
+                            .width(1.dp)
+                            .height(18.dp)
+                            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f))
+                    )
+
+                    // Settings Button
+                    IconButton(
+                        onClick = onSettings,
+                        modifier = Modifier.size(38.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = "Settings",
+                            tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.75f),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
             }
         }
@@ -670,12 +688,7 @@ fun SudokuHomeScreen(
             val displayStats = uiState.bestOverallStats ?: uiState.mediumStats ?: GameStats("MEDIUM")
             StatsCard(displayStats)
             
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                Box(modifier = Modifier.weight(1f)) {
-                    HomeActionButton("DAILY CHALLENGE", Icons.Default.CalendarToday, PrimaryCyan, onDailyChallenge)
-                }
-            }
-            HomeActionButton("SETTINGS", Icons.Default.Settings, TextMuted, onSettings)
+            HomeActionButton("DAILY CHALLENGE", Icons.Default.CalendarToday, PrimaryCyan, onDailyChallenge)
         }
     }
 }

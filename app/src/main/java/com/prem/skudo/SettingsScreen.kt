@@ -25,7 +25,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.compose.foundation.border
+import androidx.compose.foundation.horizontalScroll
+import com.prem.skudo.model.AvatarProvider
 import com.prem.skudo.ui.ProfileSummaryCard
+import com.prem.skudo.ui.UserAvatar
 import com.prem.skudo.ui.theme.*
 import com.prem.skudo.viewmodel.HomeViewModel
 import com.prem.skudo.viewmodel.SettingsViewModel
@@ -41,6 +45,7 @@ fun SettingsScreen(
     val homeUiState by homeViewModel.uiState.collectAsState()
     val settingsState by settingsViewModel.settingsState.collectAsState()
     val scrollState = rememberScrollState()
+    var showEditProfileDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -73,6 +78,33 @@ fun SettingsScreen(
                 profile = homeUiState.userProfile ?: com.prem.skudo.database.UserProfile(),
                 onClick = onViewProfile
             )
+
+            // Statistics Section
+            SettingsSection("Statistics") {
+                SettingsClickable(
+                    title = "Game Statistics",
+                    value = if (homeUiState.totalGamesPlayed > 0) "${homeUiState.totalGamesWon * 100 / homeUiState.totalGamesPlayed}% Win Rate" else "View all",
+                    icon = Icons.Default.BarChart
+                ) {
+                    onViewProfile()
+                }
+
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(1.dp)
+                        .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f))
+                )
+
+                // Pencil/Edit button placed under Statistics
+                SettingsClickable(
+                    title = "Edit Profile",
+                    value = homeUiState.userProfile?.displayName ?: "Player",
+                    icon = Icons.Default.Edit
+                ) {
+                    showEditProfileDialog = true
+                }
+            }
 
             // Appearance Section
             SettingsSection("Appearance") {
@@ -133,6 +165,20 @@ fun SettingsScreen(
             
             Spacer(modifier = Modifier.height(32.dp))
         }
+    }
+
+    if (showEditProfileDialog) {
+        val currentProfile = homeUiState.userProfile ?: com.prem.skudo.database.UserProfile()
+        EditProfileDialog(
+            profile = currentProfile,
+            onDismiss = { showEditProfileDialog = false },
+            onSave = { newName, newAvatarId ->
+                if (newName.isNotBlank()) {
+                    homeViewModel.updateDisplayName(newName)
+                }
+                homeViewModel.updateAvatar(newAvatarId)
+            }
+        )
     }
 }
 
@@ -216,4 +262,97 @@ fun SettingsClickable(
         }
         Icon(Icons.Default.ChevronRight, null, tint = TextMuted)
     }
+}
+
+@Composable
+fun EditProfileDialog(
+    profile: com.prem.skudo.database.UserProfile,
+    onDismiss: () -> Unit,
+    onSave: (name: String, avatarId: String) -> Unit
+) {
+    var displayName by remember { mutableStateOf(profile.displayName) }
+    var selectedAvatarId by remember { mutableStateOf(profile.avatarId) }
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text("Edit Profile", fontWeight = FontWeight.Bold)
+        },
+        text = {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Avatar preview
+                Box(contentAlignment = Alignment.Center) {
+                    UserAvatar(
+                        avatarId = selectedAvatarId,
+                        size = 64.dp
+                    )
+                }
+
+                OutlinedTextField(
+                    value = displayName,
+                    onValueChange = { if (it.length <= 20) displayName = it },
+                    label = { Text("Display Name") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+
+                Text(
+                    text = "Choose Avatar",
+                    style = MaterialTheme.typography.labelMedium,
+                    color = TextMuted,
+                    modifier = Modifier.align(Alignment.Start)
+                )
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AvatarProvider.avatars.forEach { avatar ->
+                        val isSelected = avatar.id == selectedAvatarId
+                        Surface(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .clip(CircleShape)
+                                .clickable { selectedAvatarId = avatar.id }
+                                .border(
+                                    width = if (isSelected) 2.dp else 0.dp,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                    shape = CircleShape
+                                ),
+                            color = MaterialTheme.colorScheme.surface
+                        ) {
+                            Box(contentAlignment = Alignment.Center) {
+                                UserAvatar(avatarId = avatar.id, size = 44.dp)
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            Button(
+                onClick = {
+                    onSave(displayName, selectedAvatarId)
+                    onDismiss()
+                },
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Text("Save")
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text("Cancel")
+            }
+        },
+        containerColor = MaterialTheme.colorScheme.surface,
+        shape = RoundedCornerShape(24.dp)
+    )
 }
