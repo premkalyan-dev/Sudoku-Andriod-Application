@@ -139,6 +139,23 @@ class RewardRepository(context: Context) {
         return DailyRewardResult(true, rewardCoins, newStreak)
     }
     
+    fun isClaimedToday(lastTimestamp: Long): Boolean {
+        return isSameDay(System.currentTimeMillis(), lastTimestamp)
+    }
+
+    fun getRewardForDay(day: Int): Long {
+        return when(((day - 1) % 7) + 1) {
+            1 -> 25L
+            2 -> 40L
+            3 -> 60L
+            4 -> 75L
+            5 -> 100L
+            6 -> 150L
+            7 -> 250L
+            else -> 25L
+        }
+    }
+    
     private fun isSameDay(t1: Long, t2: Long): Boolean {
         if (t1 == 0L || t2 == 0L) return false
         val fmt = java.text.SimpleDateFormat("yyyyMMdd", Locale.getDefault())

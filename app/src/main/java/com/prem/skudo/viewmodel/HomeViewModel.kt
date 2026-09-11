@@ -42,7 +42,8 @@ data class HomeState(
     val unlockedCount: Int = 0,
     val dailyRewardCoins: Long = 0,
     val dailyRewardStreak: Int = 0,
-    val showDailyReward: Boolean = false
+    val showDailyReward: Boolean = false,
+    val isDailyRewardClaimedToday: Boolean = false
 ) {
     val bestOverallStats: GameStats? by lazy {
         listOfNotNull(easyStats, mediumStats, hardStats, expertStats)
@@ -84,7 +85,8 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         userRepository.userProfile
             .filterNotNull()
             .onEach { profile ->
-                _uiState.update { it.copy(userProfile = profile) }
+                val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
+                _uiState.update { it.copy(userProfile = profile, isDailyRewardClaimedToday = claimed) }
             }
             // Debounce sync triggers to avoid excessive writes
             .distinctUntilChangedBy { it.updatedAt }
@@ -161,13 +163,46 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun checkDailyReward() {
         viewModelScope.launch {
-            val result = rewardRepository.claimDailyReward()
-            if (result.success) {
+            val profile = userRepository.getOrCreateProfile()
+            val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
+            _uiState.update { it.copy(isDailyRewardClaimedToday = claimed) }
+            if (!claimed) {
+                val result = rewardRepository.claimDailyReward()
+                if (result.success) {
+                    _uiState.update { it.copy(
+                        dailyRewardCoins = result.coins,
+                        dailyRewardStreak = result.streak,
+                        isDailyRewardClaimedToday = true,
+                        showDailyReward = true
+                    ) }
+                }
+            }
+        }
+    }
+
+    fun openDailyRewards() {
+        viewModelScope.launch {
+            val profile = userRepository.getOrCreateProfile()
+            val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
+            if (claimed) {
+                val currentStreak = if (profile.dailyRewardStreak > 0) profile.dailyRewardStreak else 1
+                val coins = rewardRepository.getRewardForDay(currentStreak)
                 _uiState.update { it.copy(
-                    dailyRewardCoins = result.coins,
-                    dailyRewardStreak = result.streak,
+                    dailyRewardCoins = coins,
+                    dailyRewardStreak = currentStreak,
+                    isDailyRewardClaimedToday = true,
                     showDailyReward = true
                 ) }
+            } else {
+                val result = rewardRepository.claimDailyReward()
+                if (result.success) {
+                    _uiState.update { it.copy(
+                        dailyRewardCoins = result.coins,
+                        dailyRewardStreak = result.streak,
+                        isDailyRewardClaimedToday = true,
+                        showDailyReward = true
+                    ) }
+                }
             }
         }
     }

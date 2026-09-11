@@ -26,7 +26,7 @@ data class UserProfile(
     val winStreak: Int = 0,
     
     // Economy
-    val coins: Long = 0,
+    val coins: Long = 20000L,
     val gems: Long = 0,
     val premiumStatus: Boolean = false,
     

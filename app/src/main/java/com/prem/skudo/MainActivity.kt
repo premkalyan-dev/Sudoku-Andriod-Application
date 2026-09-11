@@ -531,6 +531,7 @@ fun SudokuHomeScreen(
         DailyRewardDialog(
             streak = uiState.dailyRewardStreak,
             coins = uiState.dailyRewardCoins,
+            isAlreadyClaimed = uiState.isDailyRewardClaimedToday,
             onDismiss = { viewModel.dismissDailyReward() }
         )
     }
@@ -545,12 +546,47 @@ fun SudokuHomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Top Header Section: Capsule on Right (Coins - Shop - Settings)
+        // Top Header Section: Left Calendar Button & Right Capsule (Coins - Shop - Settings)
         Row(
             modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Calendar / Daily Rewards Button on the left
+            Surface(
+                onClick = { viewModel.openDailyRewards() },
+                color = MaterialTheme.colorScheme.surface,
+                shape = CircleShape,
+                shadowElevation = 3.dp,
+                border = BorderStroke(1.dp, MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)),
+                modifier = Modifier.size(46.dp)
+            ) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    Icon(
+                        Icons.Default.CalendarMonth,
+                        contentDescription = "Daily Rewards",
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(22.dp)
+                    )
+
+                    // Notification dot if reward is ready to be claimed today
+                    if (!uiState.isDailyRewardClaimedToday) {
+                        Box(
+                            modifier = Modifier
+                                .size(10.dp)
+                                .align(Alignment.TopEnd)
+                                .offset(x = (-8).dp, y = 8.dp)
+                                .background(EasyGreen, CircleShape)
+                                .border(1.5.dp, MaterialTheme.colorScheme.surface, CircleShape)
+                        )
+                    }
+                }
+            }
+
+            // Capsule on the right (Coins - Shop - Settings)
             val profile = uiState.userProfile ?: com.prem.skudo.database.UserProfile()
 
             Surface(

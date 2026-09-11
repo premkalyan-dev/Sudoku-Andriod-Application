@@ -3,8 +3,10 @@ package com.prem.skudo.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.MonetizationOn
@@ -19,127 +21,206 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.prem.skudo.ui.theme.AccentGold
+import com.prem.skudo.ui.theme.EasyGreen
 import com.prem.skudo.ui.theme.TextMuted
 
 @Composable
 fun DailyRewardDialog(
     streak: Int,
     coins: Long,
+    isAlreadyClaimed: Boolean = false,
     onDismiss: () -> Unit
 ) {
+    val dayStreak = if (streak <= 0) 1 else streak
+    val currentDayIndex = ((dayStreak - 1) % 7) + 1
+
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             shape = RoundedCornerShape(24.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Icon(
-                    Icons.Default.CardGiftcard,
-                    null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.primary
-                )
+                // Header Icon
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .background(
+                            if (isAlreadyClaimed) EasyGreen.copy(alpha = 0.12f)
+                            else MaterialTheme.colorScheme.primary.copy(alpha = 0.12f),
+                            CircleShape
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        if (isAlreadyClaimed) Icons.Default.CalendarMonth else Icons.Default.CardGiftcard,
+                        contentDescription = null,
+                        modifier = Modifier.size(36.dp),
+                        tint = if (isAlreadyClaimed) EasyGreen else MaterialTheme.colorScheme.primary
+                    )
+                }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(14.dp))
                 
                 Text(
                     "DAILY REWARD",
-                    style = MaterialTheme.typography.headlineSmall,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.ExtraBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.onSurface
                 )
+                
+                Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    "Day $streak of your streak!",
+                    if (isAlreadyClaimed) "Day $currentDayIndex claimed! Come back tomorrow for Day ${if (currentDayIndex >= 7) 1 else currentDayIndex + 1}."
+                    else "Day $currentDayIndex of your login streak!",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = TextMuted
+                    color = TextMuted,
+                    textAlign = TextAlign.Center
                 )
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
-                // Reward Grid (Simplified)
+                // 7-day Reward Grid
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center,
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val rewardAmounts = listOf(25L, 40L, 60L, 75L, 100L, 150L, 250L)
+                    
                     repeat(7) { index ->
                         val day = index + 1
-                        val isClaimed = day < streak
-                        val isCurrent = day == streak
+                        val isClaimed = if (isAlreadyClaimed) day <= currentDayIndex else day < currentDayIndex
+                        val isCurrent = day == currentDayIndex
+                        val dayCoins = rewardAmounts[index]
                         
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.padding(4.dp)
+                            modifier = Modifier.weight(1f).padding(horizontal = 2.dp)
                         ) {
+                            Text(
+                                "D$day",
+                                style = MaterialTheme.typography.labelSmall,
+                                fontWeight = if (isCurrent) FontWeight.Bold else FontWeight.Normal,
+                                color = if (isCurrent) MaterialTheme.colorScheme.primary else TextMuted,
+                                fontSize = 10.sp
+                            )
+                            
+                            Spacer(modifier = Modifier.height(3.dp))
+                            
                             Box(
                                 modifier = Modifier
-                                    .size(32.dp)
+                                    .fillMaxWidth()
+                                    .height(46.dp)
                                     .background(
-                                        if (isCurrent) MaterialTheme.colorScheme.primary 
-                                        else if (isClaimed) MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)
-                                        else MaterialTheme.colorScheme.surfaceVariant,
+                                        when {
+                                            isClaimed -> EasyGreen.copy(alpha = 0.12f)
+                                            isCurrent -> MaterialTheme.colorScheme.primary.copy(alpha = 0.12f)
+                                            day == 7 -> AccentGold.copy(alpha = 0.10f)
+                                            else -> MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
+                                        },
                                         RoundedCornerShape(8.dp)
                                     )
                                     .border(
                                         1.dp,
-                                        if (isCurrent) MaterialTheme.colorScheme.primary else Color.Transparent,
+                                        when {
+                                            isClaimed -> EasyGreen.copy(alpha = 0.35f)
+                                            isCurrent -> MaterialTheme.colorScheme.primary
+                                            day == 7 -> AccentGold.copy(alpha = 0.35f)
+                                            else -> Color.Transparent
+                                        },
                                         RoundedCornerShape(8.dp)
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 if (isClaimed) {
-                                    Icon(Icons.Default.CheckCircle, null, tint = MaterialTheme.colorScheme.primary, modifier = Modifier.size(16.dp))
-                                } else {
-                                    Text(
-                                        day.toString(),
-                                        color = if (isCurrent) Color.White else TextMuted,
-                                        fontSize = 12.sp,
-                                        fontWeight = FontWeight.Bold
+                                    Icon(
+                                        Icons.Default.CheckCircle,
+                                        contentDescription = "Claimed",
+                                        tint = EasyGreen,
+                                        modifier = Modifier.size(18.dp)
                                     )
+                                } else {
+                                    Column(
+                                        horizontalAlignment = Alignment.CenterHorizontally,
+                                        verticalArrangement = Arrangement.Center
+                                    ) {
+                                        if (day == 7) {
+                                            Icon(
+                                                Icons.Default.CardGiftcard,
+                                                contentDescription = null,
+                                                tint = AccentGold,
+                                                modifier = Modifier.size(16.dp)
+                                            )
+                                        } else {
+                                            Icon(
+                                                Icons.Default.MonetizationOn,
+                                                contentDescription = null,
+                                                tint = if (isCurrent) AccentGold else TextMuted.copy(alpha = 0.6f),
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                        }
+                                        Text(
+                                            "$dayCoins",
+                                            color = if (isCurrent) MaterialTheme.colorScheme.primary else TextMuted,
+                                            fontSize = 9.sp,
+                                            fontWeight = FontWeight.Bold
+                                        )
+                                    }
                                 }
                             }
                         }
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
+                // Reward Banner
                 Surface(
                     color = AccentGold.copy(alpha = 0.1f),
                     shape = RoundedCornerShape(16.dp),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Row(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(14.dp),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
                     ) {
-                        Icon(Icons.Default.MonetizationOn, null, tint = AccentGold)
+                        Icon(
+                            Icons.Default.MonetizationOn,
+                            contentDescription = null,
+                            tint = AccentGold,
+                            modifier = Modifier.size(24.dp)
+                        )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(
-                            "+$coins Coins",
-                            style = MaterialTheme.typography.titleLarge,
+                            if (isAlreadyClaimed) "Today: +$coins Coins (Claimed)"
+                            else "+$coins Coins",
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = AccentGold
                         )
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(20.dp))
                 
                 Button(
                     onClick = onDismiss,
                     modifier = Modifier.fillMaxWidth().height(48.dp),
                     shape = RoundedCornerShape(12.dp)
                 ) {
-                    Text("CLAIM REWARD", fontWeight = FontWeight.Bold)
+                    Text(
+                        if (isAlreadyClaimed) "AWESOME" else "CLAIM REWARD",
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
