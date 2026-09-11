@@ -6,8 +6,10 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
@@ -123,16 +125,17 @@ fun RewardContent(
 ) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(0.9f)
-            .padding(vertical = 24.dp),
-        shape = RoundedCornerShape(32.dp),
+            .fillMaxWidth(0.88f)
+            .padding(vertical = 16.dp),
+        shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 20.dp, vertical = 18.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Victory Icon & Title
@@ -140,7 +143,7 @@ fun RewardContent(
                 val infiniteTransition = rememberInfiniteTransition(label = "iconScale")
                 val scale by infiniteTransition.animateFloat(
                     initialValue = 1f,
-                    targetValue = 1.1f,
+                    targetValue = 1.08f,
                     animationSpec = infiniteRepeatable(
                         animation = tween(1000, easing = FastOutSlowInEasing),
                         repeatMode = RepeatMode.Reverse
@@ -152,45 +155,47 @@ fun RewardContent(
                     Icons.Default.EmojiEvents,
                     null,
                     modifier = Modifier
-                        .size(80.dp)
+                        .size(48.dp)
                         .scale(scale),
                     tint = AccentGold
                 )
             }
             
+            Spacer(modifier = Modifier.height(4.dp))
+
             Text(
                 stringResource(R.string.victory),
-                style = MaterialTheme.typography.displaySmall,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onSurface,
-                letterSpacing = 4.sp
+                letterSpacing = 2.sp
             )
             
             Text(
                 stringResource(R.string.puzzle_completed),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = TextMuted
             )
 
             if (state.isPerfect) {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(6.dp))
                 Surface(
                     color = AccentGold.copy(alpha = 0.1f),
-                    shape = RoundedCornerShape(16.dp),
+                    shape = RoundedCornerShape(12.dp),
                     border = BorderStroke(1.dp, AccentGold.copy(alpha = 0.5f))
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 4.dp),
+                        modifier = Modifier.padding(horizontal = 10.dp, vertical = 3.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(Icons.Default.Star, null, Modifier.size(16.dp), AccentGold)
+                        Icon(Icons.Default.Star, null, Modifier.size(14.dp), AccentGold)
                         Spacer(Modifier.width(4.dp))
-                        Text("PERFECT GAME", color = AccentGold, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Text("PERFECT GAME", color = AccentGold, fontWeight = FontWeight.Bold, fontSize = 11.sp)
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(14.dp))
             
             // Game Info Row
             Row(
@@ -207,7 +212,7 @@ fun RewardContent(
                 InfoBadge("$cpm CPM", AccentGold)
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
             // Level Up / Progress Section
             if (state.leveledUp) {
@@ -216,62 +221,69 @@ fun RewardContent(
                 LevelProgressSection(state)
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(12.dp))
             
             // Rewards Section
-            Text(
-                stringResource(R.string.rewards_earned),
-                style = MaterialTheme.typography.labelLarge,
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
             ) {
-                RewardCard("+${state.xpEarned}", stringResource(R.string.xp), Icons.Default.AddCircle, MaterialTheme.colorScheme.primary)
-                RewardCard("+${state.coinsEarned}", stringResource(R.string.coins), Icons.Default.MonetizationOn, AccentGold)
+                RewardCard(
+                    value = "+${state.xpEarned}",
+                    label = stringResource(R.string.xp),
+                    icon = Icons.Default.AddCircle,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.weight(1f)
+                )
+                RewardCard(
+                    value = "+${state.coinsEarned}",
+                    label = stringResource(R.string.coins),
+                    icon = Icons.Default.MonetizationOn,
+                    color = AccentGold,
+                    modifier = Modifier.weight(1f)
+                )
             }
             
             if (state.unlockedAchievements.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(10.dp))
                 AchievementUnlocks(state.unlockedAchievements)
             }
             
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
             // Action Buttons
-            Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                OutlinedButton(
+                    onClick = onHome,
+                    modifier = Modifier
+                        .weight(1f)
+                        .height(46.dp),
+                    shape = RoundedCornerShape(14.dp),
+                    border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+                ) {
+                    Text(
+                        stringResource(R.string.home),
+                        style = MaterialTheme.typography.labelLarge,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+
                 Button(
                     onClick = onPlayAgain,
-                    modifier = Modifier.fillMaxWidth().height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
+                    modifier = Modifier
+                        .weight(1.3f)
+                        .height(46.dp),
+                    shape = RoundedCornerShape(14.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text(stringResource(R.string.play_again), fontWeight = FontWeight.Bold, fontSize = 16.sp)
-                }
-                
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                    OutlinedButton(
-                        onClick = onHome,
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline)
-                    ) {
-                        Text(stringResource(R.string.home), color = MaterialTheme.colorScheme.onSurface)
-                    }
-                    
-                    Button(
-                        onClick = onHome, // Or continue to next puzzle
-                        modifier = Modifier.weight(1f).height(56.dp),
-                        shape = RoundedCornerShape(16.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
-                    ) {
-                        Text(stringResource(R.string.continue_btn), color = Color.White)
-                    }
+                    Text(
+                        stringResource(R.string.play_again),
+                        style = MaterialTheme.typography.labelLarge,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }
@@ -282,44 +294,54 @@ fun RewardContent(
 fun InfoBadge(text: String, color: Color) {
     Box(
         modifier = Modifier
-            .background(color.copy(alpha = 0.1f), RoundedCornerShape(20.dp))
-            .border(1.dp, color.copy(alpha = 0.5f), RoundedCornerShape(20.dp))
-            .padding(horizontal = 16.dp, vertical = 6.dp)
+            .background(color.copy(alpha = 0.1f), RoundedCornerShape(16.dp))
+            .border(1.dp, color.copy(alpha = 0.5f), RoundedCornerShape(16.dp))
+            .padding(horizontal = 10.dp, vertical = 4.dp)
     ) {
-        Text(text, color = color, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+        Text(text, color = color, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }
 }
 
 @Composable
-fun RewardCard(value: String, label: String, icon: ImageVector, color: Color) {
+fun RewardCard(
+    value: String,
+    label: String,
+    icon: ImageVector,
+    color: Color,
+    modifier: Modifier = Modifier
+) {
     var animatedValue by remember { mutableIntStateOf(0) }
     val target = value.filter { it.isDigit() }.toIntOrNull() ?: 0
     
     LaunchedEffect(Unit) {
         delay(500)
-        val duration = 1000
-        val steps = 20
+        val duration = 800
+        val steps = 15
         for (i in 1..steps) {
             delay((duration / steps).toLong())
             animatedValue = (target * (i.toFloat() / steps)).toInt()
         }
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .background(color.copy(alpha = 0.05f), RoundedCornerShape(16.dp))
-            .padding(12.dp)
-            .widthIn(min = 80.dp)
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center,
+        modifier = modifier
+            .background(color.copy(alpha = 0.06f), RoundedCornerShape(12.dp))
+            .border(1.dp, color.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
+            .padding(horizontal = 12.dp, vertical = 8.dp)
     ) {
-        Icon(icon, null, tint = color, modifier = Modifier.size(24.dp))
-        Text(
-            if (target > 0) "+$animatedValue" else value, 
-            fontWeight = FontWeight.ExtraBold, 
-            fontSize = 18.sp, 
-            color = MaterialTheme.colorScheme.onSurface
-        )
-        Text(label, fontSize = 10.sp, color = TextMuted)
+        Icon(icon, null, tint = color, modifier = Modifier.size(20.dp))
+        Spacer(modifier = Modifier.width(6.dp))
+        Column {
+            Text(
+                if (target > 0) "+$animatedValue" else value, 
+                fontWeight = FontWeight.ExtraBold, 
+                fontSize = 15.sp, 
+                color = MaterialTheme.colorScheme.onSurface
+            )
+            Text(label, fontSize = 10.sp, color = TextMuted)
+        }
     }
 }
 
@@ -327,20 +349,20 @@ fun RewardCard(value: String, label: String, icon: ImageVector, color: Color) {
 fun LevelProgressSection(state: GameState) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-            Text(stringResource(R.string.level, state.newLevel), fontWeight = FontWeight.Bold)
+            Text(stringResource(R.string.level, state.newLevel), fontWeight = FontWeight.Bold, fontSize = 13.sp)
             Text(
                 text = stringResource(R.string.rank, com.prem.skudo.utils.LevelManager.getTitleForLevel(state.newLevel)),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 13.sp
             )
         }
         
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(6.dp))
         
-        // This is a bit tricky because we don't have current progress easily in state
-        // In a real app we'd get this from the VM
         LinearProgressIndicator(
-            progress = { 0.7f }, // Placeholder
-            modifier = Modifier.fillMaxWidth().height(12.dp).clip(CircleShape),
+            progress = { 0.7f },
+            modifier = Modifier.fillMaxWidth().height(8.dp).clip(CircleShape),
             color = MaterialTheme.colorScheme.primary,
             trackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
         )
@@ -351,7 +373,7 @@ fun LevelProgressSection(state: GameState) {
 fun LevelUpSection(newLevel: Int) {
     val infiniteTransition = rememberInfiniteTransition(label = "levelup")
     val alpha by infiniteTransition.animateFloat(
-        initialValue = 0.5f,
+        initialValue = 0.7f,
         targetValue = 1f,
         animationSpec = infiniteRepeatable(tween(500), RepeatMode.Reverse),
         label = "alpha"
@@ -363,27 +385,28 @@ fun LevelUpSection(newLevel: Int) {
             .fillMaxWidth()
             .background(
                 Brush.verticalGradient(listOf(AccentGold.copy(0.1f), Color.Transparent)),
-                RoundedCornerShape(16.dp)
+                RoundedCornerShape(12.dp)
             )
-            .padding(16.dp)
+            .padding(8.dp)
     ) {
         Text(
             stringResource(R.string.level_up),
             color = AccentGold,
-            style = MaterialTheme.typography.headlineMedium,
+            style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Black,
-            modifier = Modifier.scale(alpha + 0.5f)
+            modifier = Modifier.scale(alpha + 0.1f)
         )
         Text(
             stringResource(R.string.welcome_level, newLevel),
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.Medium,
+            fontSize = 12.sp,
             color = MaterialTheme.colorScheme.onSurface
         )
         Text(
             com.prem.skudo.utils.LevelManager.getTitleForLevel(newLevel),
             color = MaterialTheme.colorScheme.primary,
-            style = MaterialTheme.typography.titleLarge,
-            fontWeight = FontWeight.ExtraBold
+            style = MaterialTheme.typography.bodyMedium,
+            fontWeight = FontWeight.Bold
         )
     }
 }
@@ -393,15 +416,15 @@ fun AchievementUnlocks(achievements: List<com.prem.skudo.database.Achievement>) 
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(16.dp))
-            .padding(12.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant, RoundedCornerShape(12.dp))
+            .padding(8.dp)
     ) {
-        Text(stringResource(R.string.achievements_unlocked), style = MaterialTheme.typography.labelMedium, color = TextMuted)
+        Text(stringResource(R.string.achievements_unlocked), style = MaterialTheme.typography.labelSmall, color = TextMuted)
         achievements.forEach { achievement ->
-            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 4.dp)) {
-                Icon(Icons.Default.Stars, null, tint = AccentGold, modifier = Modifier.size(16.dp))
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(achievement.title, fontWeight = FontWeight.Bold, fontSize = 14.sp)
+            Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(vertical = 2.dp)) {
+                Icon(Icons.Default.Stars, null, tint = AccentGold, modifier = Modifier.size(14.dp))
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(achievement.title, fontWeight = FontWeight.Bold, fontSize = 12.sp)
             }
         }
     }
