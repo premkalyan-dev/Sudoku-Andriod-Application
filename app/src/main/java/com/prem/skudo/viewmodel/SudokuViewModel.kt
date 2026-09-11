@@ -63,6 +63,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             _uiState.update { it.copy(boardStyle = style) }
         }.launchIn(viewModelScope)
 
+        settingsRepository.vibration.onEach { vibration ->
+            hapticManager.isEnabled = vibration
+        }.launchIn(viewModelScope)
+
         userRepository.userProfile.onEach { profile ->
             _uiState.update { 
                 it.copy(

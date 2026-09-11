@@ -25,8 +25,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
@@ -521,7 +519,6 @@ fun PremiumNumberKey(
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isPressed by interactionSource.collectIsPressedAsState()
-    val haptic = LocalHapticFeedback.current
 
     val scale by animateFloatAsState(
         targetValue = if (isPressed) 0.88f else if (isSelected) 1.08f else 1f,
@@ -565,7 +562,6 @@ fun PremiumNumberKey(
     Surface(
         onClick = {
             if (!isCompleted) {
-                haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 onClick()
             }
         },
@@ -631,7 +627,6 @@ fun CompactActionButton(
         ),
         label = "actionBtnScale"
     )
-    val haptic = LocalHapticFeedback.current
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -639,10 +634,7 @@ fun CompactActionButton(
     ) {
         Box(contentAlignment = Alignment.TopEnd) {
             Surface(
-                onClick = {
-                    haptic.performHapticFeedback(HapticFeedbackType.TextHandleMove)
-                    onClick()
-                },
+                onClick = onClick,
                 interactionSource = interactionSource,
                 shape = CircleShape,
                 color = if (active) MaterialTheme.colorScheme.primary else Color.Transparent,

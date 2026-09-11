@@ -12,7 +12,9 @@ import kotlinx.coroutines.launch
 
 class HapticManager(private val context: Context) {
     private val settingsRepository = SettingsRepository(context)
-    private var isEnabled = true
+    
+    @Volatile
+    var isEnabled: Boolean = true
 
     private val vibrator: Vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         val vibratorManager = context.getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
@@ -23,7 +25,7 @@ class HapticManager(private val context: Context) {
     }
 
     init {
-        CoroutineScope(Dispatchers.IO).launch {
+        CoroutineScope(Dispatchers.Main.immediate).launch {
             settingsRepository.vibration.collect {
                 isEnabled = it
             }
