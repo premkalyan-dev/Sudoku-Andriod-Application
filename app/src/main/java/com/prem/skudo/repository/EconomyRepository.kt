@@ -26,19 +26,6 @@ class EconomyRepository(context: Context) {
         userDao.updateProfile(updatedProfile)
     }
 
-    suspend fun addCoinsAndHints(coins: Long, hints: Int, gems: Long = 0L) {
-        val profile = userDao.getUserProfile() ?: return
-        val updatedProfile = profile.copy(
-            coins = profile.coins + coins,
-            totalCoinsEarned = profile.totalCoinsEarned + coins,
-            hints = profile.hints + hints,
-            gems = profile.gems + gems,
-            totalGemsEarned = profile.totalGemsEarned + gems,
-            updatedAt = System.currentTimeMillis()
-        )
-        userDao.updateProfile(updatedProfile)
-    }
-
     suspend fun spendCoins(amount: Long): Boolean {
         val profile = userDao.getUserProfile() ?: return false
         if (profile.coins < amount) return false

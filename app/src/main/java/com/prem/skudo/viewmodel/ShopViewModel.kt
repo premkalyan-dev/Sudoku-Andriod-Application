@@ -12,13 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 @Immutable
-data class PurchaseRewardDetails(
-    val coinsGained: Long,
-    val hintsReceived: Int,
-    val rewardsReceived: String
-)
-
-@Immutable
 data class ShopState(
     val coins: Long = 0,
     val gems: Long = 0,
@@ -26,7 +19,6 @@ data class ShopState(
     val unlockedAvatars: List<String> = emptyList(),
     val unlockedThemes: List<String> = emptyList(),
     val purchaseSuccess: Boolean = false,
-    val purchaseRewardDetails: PurchaseRewardDetails? = null,
     val errorMessage: String? = null
 )
 
@@ -53,34 +45,11 @@ class ShopViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun buyCoinPack(coins: Long, bonusHints: Int, bonusGems: Long, rewardsDescription: String) {
-        viewModelScope.launch {
-            val success = shopRepository.buyCoinPack(coins, bonusHints, bonusGems)
-            if (success) {
-                _uiState.value = _uiState.value.copy(
-                    purchaseSuccess = true,
-                    purchaseRewardDetails = PurchaseRewardDetails(
-                        coinsGained = coins,
-                        hintsReceived = bonusHints,
-                        rewardsReceived = rewardsDescription
-                    )
-                )
-            }
-        }
-    }
-
-    fun buyHints(hintsCount: Int, cost: Long, packName: String = "Hint Pack") {
+    fun buyHints(hintsCount: Int, cost: Long) {
         viewModelScope.launch {
             val success = shopRepository.buyHintsPackage(hintsCount, cost)
             if (success) {
-                _uiState.value = _uiState.value.copy(
-                    purchaseSuccess = true,
-                    purchaseRewardDetails = PurchaseRewardDetails(
-                        coinsGained = 0,
-                        hintsReceived = hintsCount,
-                        rewardsReceived = "$packName Activated"
-                    )
-                )
+                _uiState.value = _uiState.value.copy(purchaseSuccess = true)
             } else {
                 _uiState.value = _uiState.value.copy(errorMessage = "Not enough coins!")
             }
@@ -91,14 +60,7 @@ class ShopViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val success = shopRepository.buyAvatar(avatarId)
             if (success) {
-                _uiState.value = _uiState.value.copy(
-                    purchaseSuccess = true,
-                    purchaseRewardDetails = PurchaseRewardDetails(
-                        coinsGained = 0,
-                        hintsReceived = 0,
-                        rewardsReceived = "Avatar Unlocked"
-                    )
-                )
+                _uiState.value = _uiState.value.copy(purchaseSuccess = true)
             } else {
                 _uiState.value = _uiState.value.copy(errorMessage = "Not enough coins!")
             }
@@ -109,32 +71,14 @@ class ShopViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val success = shopRepository.buyTheme(themeName)
             if (success) {
-                _uiState.value = _uiState.value.copy(
-                    purchaseSuccess = true,
-                    purchaseRewardDetails = PurchaseRewardDetails(
-                        coinsGained = 0,
-                        hintsReceived = 0,
-                        rewardsReceived = "$themeName Theme Unlocked"
-                    )
-                )
+                _uiState.value = _uiState.value.copy(purchaseSuccess = true)
             } else {
                 _uiState.value = _uiState.value.copy(errorMessage = "Not enough coins!")
             }
         }
     }
 
-    fun dismissPurchaseDialog() {
-        _uiState.value = _uiState.value.copy(
-            purchaseSuccess = false,
-            purchaseRewardDetails = null
-        )
-    }
-
     fun clearMessages() {
-        _uiState.value = _uiState.value.copy(
-            purchaseSuccess = false,
-            purchaseRewardDetails = null,
-            errorMessage = null
-        )
+        _uiState.value = _uiState.value.copy(purchaseSuccess = false, errorMessage = null)
     }
 }
