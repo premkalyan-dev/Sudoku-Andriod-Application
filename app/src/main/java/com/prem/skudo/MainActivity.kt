@@ -532,6 +532,7 @@ fun SudokuHomeScreen(
             streak = uiState.dailyRewardStreak,
             coins = uiState.dailyRewardCoins,
             isAlreadyClaimed = uiState.isDailyRewardClaimedToday,
+            onClaim = { viewModel.claimDailyReward() },
             onDismiss = { viewModel.dismissDailyReward() }
         )
     }
@@ -602,7 +603,10 @@ fun SudokuHomeScreen(
                     // Coins
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.padding(end = 10.dp)
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable { onShop() }
+                            .padding(end = 10.dp)
                     ) {
                         Icon(
                             Icons.Default.MonetizationOn,

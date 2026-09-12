@@ -217,7 +217,7 @@ class SudokuGeneratorTest {
     }
 
     @Test
-    fun `generated puzzle has correct row/col/box indices in each cell`() {
+    fun `generated puzzle has correct row col box indices in each cell`() {
         repeat(50) {
             val (puzzle, _) = generator.generate(Difficulty.MEDIUM)
             for (row in 0..8) {

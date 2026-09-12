@@ -242,6 +242,7 @@ fun SudokuScreenContent(
                 // 5. Premium Number Pad
                 PremiumNumberPad(
                     board = uiState.puzzle,
+                    solution = uiState.solution,
                     selectedNumber = uiState.selectedNumber,
                     onNumberClick = onNumberClick,
                     isNotesMode = uiState.isNotesMode
@@ -472,14 +473,19 @@ fun ActionButtonsRow(
 @Composable
 fun PremiumNumberPad(
     board: SudokuBoard,
+    solution: SudokuBoard = SudokuBoard(),
     selectedNumber: Int?,
     onNumberClick: (Int) -> Unit,
     isNotesMode: Boolean
 ) {
-    val counts = remember(board) {
+    val counts = remember(board, solution) {
         val c = IntArray(10) { 0 }
         board.cells.flatten().forEach { cell ->
-            cell.value?.let { if (it in 1..9) c[it]++ }
+            val solVal = solution[cell.row, cell.col].value
+            val isMatchingSolution = (solVal != null && cell.value == solVal) || (solVal == null && cell.isClue)
+            if (cell.value != null && cell.value in 1..9 && cell.isValid && isMatchingSolution) {
+                c[cell.value]++
+            }
         }
         c
     }

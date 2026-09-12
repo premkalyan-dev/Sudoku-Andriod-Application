@@ -331,21 +331,13 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
             _uiState.update { state ->
                 val correctValue = state.solution[row, col].value
                 val actuallyCorrect = num == correctValue
-                val isCorrect = !state.autoCheck || actuallyCorrect
+                val isCorrect = actuallyCorrect
                 
                 var newMistakes = state.mistakes
                 
-                if (!actuallyCorrect && state.autoCheck) {
+                if (!actuallyCorrect) {
                     newMistakes++
                     hapticManager.vibrate(com.prem.skudo.utils.HapticType.STRONG)
-                    if (state.maxMistakes in 1..newMistakes) {
-                        timerManager.stop()
-                        return@update state.copy(
-                            selectedNumber = num,
-                            mistakes = newMistakes,
-                            showContinueDialog = true
-                        )
-                    }
                 }
 
                 // Selected cell info for highlights
@@ -397,12 +389,22 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                     }
                 }
                 
+                val isGameOverMistakes = !actuallyCorrect && state.maxMistakes in 1..newMistakes
+                if (isGameOverMistakes) {
+                    timerManager.stop()
+                }
+
                 val finalState = state.copy(
                     puzzle = SudokuBoard(newCells),
                     selectedNumber = num,
                     mistakes = newMistakes,
+                    showContinueDialog = isGameOverMistakes
                 )
-                checkCompletions(finalState, row, col)
+                if (isGameOverMistakes) {
+                    finalState
+                } else {
+                    checkCompletions(finalState, row, col)
+                }
             }
             checkVictory()
         }
@@ -412,15 +414,15 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
     private fun checkCompletions(state: GameState, row: Int, col: Int): GameState {
         val puzzle = state.puzzle
         
-        val isRowComplete = (0..8).all { c -> puzzle[row, c].value != null && puzzle[row, c].isValid }
-        val isColComplete = (0..8).all { r -> puzzle[r, col].value != null && puzzle[r, col].isValid }
+        val isRowComplete = (0..8).all { c -> puzzle[row, c].value != null && puzzle[row, c].isValid && puzzle[row, c].value == state.solution[row, c].value }
+        val isColComplete = (0..8).all { r -> puzzle[r, col].value != null && puzzle[r, col].isValid && puzzle[r, col].value == state.solution[r, col].value }
         
         val boxRow = (row / 3) * 3
         val boxCol = (col / 3) * 3
         val boxIndex = (row / 3) * 3 + (col / 3)
         val isBoxComplete = (boxRow until boxRow + 3).all { r ->
             (boxCol until boxCol + 3).all { c ->
-                puzzle[r, c].value != null && puzzle[r, c].isValid
+                puzzle[r, c].value != null && puzzle[r, c].isValid && puzzle[r, c].value == state.solution[r, c].value
             }
         }
 
@@ -615,7 +617,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         val newCells = state.puzzle.cells.mapIndexed { ri, rowList ->
             rowList.mapIndexed { ci, cell ->
                 if (ri == row && ci == col) {
-                    val isCorrect = !state.autoCheck || value == null || value == state.solution[ri, ci].value
+                    val isCorrect = value == null || value == state.solution[ri, ci].value
                     cell.copy(value = value, isValid = isCorrect, notes = emptySet())
                 } else cell
             }
@@ -631,7 +633,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         val newCells = puzzle.cells.mapIndexed { ri, rowList ->
             rowList.mapIndexed { ci, cell ->
                 val value = cell.value
-                val isValid = if (!state.autoCheck || value == null) true else value == solution[ri, ci].value
+                val isValid = value == null || value == solution[ri, ci].value
                 if (cell.isValid == isValid) cell else cell.copy(isValid = isValid)
             }
         }

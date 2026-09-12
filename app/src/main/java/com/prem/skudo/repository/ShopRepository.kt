@@ -10,6 +10,11 @@ class ShopRepository(context: Context) {
         return economyRepository.addHints(hintsCount, cost)
     }
 
+    suspend fun buyCoinPack(coins: Long, bonusHints: Int, bonusGems: Long): Boolean {
+        economyRepository.addCoinsAndHints(coins, bonusHints, bonusGems)
+        return true
+    }
+
     suspend fun buyExtraLife(): Boolean {
         return economyRepository.spendCoins(200L)
     }
