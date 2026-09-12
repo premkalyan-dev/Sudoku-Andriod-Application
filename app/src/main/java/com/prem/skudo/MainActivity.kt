@@ -62,14 +62,8 @@ class MainActivity : ComponentActivity() {
             val settingsViewModel: com.prem.skudo.viewmodel.SettingsViewModel = viewModel()
             val settingsState by settingsViewModel.settingsState.collectAsState()
             
-            val darkTheme = when(settingsState.themeMode) {
-                "LIGHT" -> false
-                "DARK" -> true
-                else -> isSystemInDarkTheme()
-            }
-
             SudokuTheme(
-                darkTheme = darkTheme,
+                darkTheme = false,
                 accentColorName = settingsState.accentColor
             ) {
                 val navController = rememberNavController()

@@ -16,18 +16,12 @@ fun SudokuTheme(
     val accentColor = when (accentColorName) {
         "Cyan" -> PrimaryCyan
         "Gold" -> AccentGold
-        "Green" -> EasyGreen
-        "Purple" -> HardPurple
-        "Red" -> ExpertRed
         else -> PrimaryCyan
     }
 
     val secondaryColor = when (accentColorName) {
         "Cyan" -> SecondaryCyan
         "Gold" -> Color(0xFFF39C12)
-        "Green" -> Color(0xFF2ECC71)
-        "Purple" -> Color(0xFF9B59B6)
-        "Red" -> Color(0xFFE74C3C)
         else -> SecondaryCyan
     }
 

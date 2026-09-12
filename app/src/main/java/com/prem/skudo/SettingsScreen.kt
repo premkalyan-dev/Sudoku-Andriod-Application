@@ -84,21 +84,9 @@ fun SettingsScreen(
 
             // Appearance Section
             SettingsSection("Appearance") {
-                SettingsClickable("Theme", settingsState.themeMode, Icons.Default.Palette) {
-                    // Logic to cycle themes or show dialog
-                    val nextTheme = when(settingsState.themeMode) {
-                        "SYSTEM" -> "LIGHT"
-                        "LIGHT" -> "DARK"
-                        else -> "SYSTEM"
-                    }
-                    settingsViewModel.updateThemeMode(nextTheme)
-                }
                 SettingsClickable("Accent Color", settingsState.accentColor, Icons.Default.ColorLens) {
                     val nextColor = when(settingsState.accentColor) {
                         "Cyan" -> "Gold"
-                        "Gold" -> "Green"
-                        "Green" -> "Purple"
-                        "Purple" -> "Red"
                         else -> "Cyan"
                     }
                     settingsViewModel.updateAccentColor(nextColor)
