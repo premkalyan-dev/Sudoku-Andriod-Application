@@ -369,8 +369,8 @@ fun PremiumGameHeader(
         ) {
             Box(contentAlignment = Alignment.Center) {
                 Icon(
-                    Icons.Default.Settings,
-                    contentDescription = "Settings",
+                    Icons.Default.Pause,
+                    contentDescription = "Pause",
                     tint = MaterialTheme.colorScheme.onSurface,
                     modifier = Modifier.size(22.dp)
                 )
@@ -746,8 +746,8 @@ fun PauseMenuDialog(
                         border = BorderStroke(2.dp, MaterialTheme.colorScheme.outlineVariant)
                     ) {
                         Icon(Icons.Default.Refresh, null, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("RESTART", fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                        Spacer(Modifier.width(4.dp))
+                        Text("RESTART", fontWeight = FontWeight.Bold, fontSize = 12.sp, maxLines = 1)
                     }
                     
                     OutlinedButton(
