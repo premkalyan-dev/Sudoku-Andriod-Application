@@ -503,7 +503,7 @@ fun LoadingScreen(onLoadingComplete: () -> Unit) {
 fun SudokuHomeScreen(
     onStartGame: (Difficulty, Boolean) -> Unit,
     onContinueGame: (Difficulty, Boolean) -> Unit,
-    onDailyChallenge: () -> Unit,
+    onDailyChallenge: () -> Unit = {},
     onViewProfile: () -> Unit,
     onSettings: () -> Unit,
     onShop: () -> Unit,
@@ -723,13 +723,9 @@ fun SudokuHomeScreen(
             }
         }
 
-        // Action Section (Stats & Bottom Buttons)
-        Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            val displayStats = uiState.bestOverallStats ?: uiState.mediumStats ?: GameStats("MEDIUM")
-            StatsCard(displayStats)
-            
-            HomeActionButton("DAILY CHALLENGE", Icons.Default.CalendarToday, PrimaryCyan, onDailyChallenge)
-        }
+        // Action Section (Stats)
+        val displayStats = uiState.bestOverallStats ?: uiState.mediumStats ?: GameStats("MEDIUM")
+        StatsCard(displayStats)
     }
 }
 
