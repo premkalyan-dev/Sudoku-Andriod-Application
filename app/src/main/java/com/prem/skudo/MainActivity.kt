@@ -156,7 +156,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=true")
                                 },
                                 onDailyChallenge = { navController.navigate("daily_challenge") },
-                                onAcademy = { navController.navigate("academy") },
+
                                 onViewProfile = { navController.navigate("profile") },
                                 onSettings = { navController.navigate("settings") },
                                 onShop = { navController.navigate("shop") },
@@ -243,15 +243,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel = homeViewModel
                             )
                         }
-                        composable("academy") {
-                            com.prem.skudo.ui.SudokuAcademyScreen(
-                                onBack = { navController.popBackStack() },
-                                onStartPractice = {
-                                    gameViewModel.dismissAllDialogs()
-                                    navController.navigate("game/${Difficulty.EASY.name}?isDaily=false&resume=false")
-                                }
-                            )
-                        }
+
                     }
                 }
             }
@@ -514,7 +506,7 @@ fun SudokuHomeScreen(
     onStartGame: (Difficulty, Boolean) -> Unit,
     onContinueGame: (Difficulty, Boolean) -> Unit,
     onDailyChallenge: () -> Unit = {},
-    onAcademy: () -> Unit = {},
+
     onViewProfile: () -> Unit,
     onSettings: () -> Unit,
     onShop: () -> Unit,
@@ -734,12 +726,10 @@ fun SudokuHomeScreen(
             }
         }
 
-        // Action Section (Stats & Academy)
+        // Action Section (Stats)
         Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
             val displayStats = uiState.bestOverallStats ?: uiState.mediumStats ?: GameStats("MEDIUM")
             StatsCard(displayStats)
-            
-            HomeActionButton("SUDOKU ACADEMY", Icons.Default.School, PrimaryCyan, onAcademy)
         }
     }
 }
@@ -993,7 +983,7 @@ fun SudokuHomeScreenPreview() {
             onStartGame = { _, _ -> },
             onContinueGame = { _, _ -> },
             onDailyChallenge = {},
-            onAcademy = {},
+
             onViewProfile = {},
             onSettings = {},
             onShop = {}
