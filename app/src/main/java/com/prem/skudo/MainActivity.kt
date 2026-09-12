@@ -156,7 +156,7 @@ class MainActivity : ComponentActivity() {
                                     navController.navigate("game/${difficulty.name}?isDaily=$isDaily&resume=true")
                                 },
                                 onDailyChallenge = { navController.navigate("daily_challenge") },
-
+                                onDailyRewards = { navController.navigate("daily_rewards") },
                                 onViewProfile = { navController.navigate("profile") },
                                 onSettings = { navController.navigate("settings") },
                                 onShop = { navController.navigate("shop") },
@@ -241,6 +241,42 @@ class MainActivity : ComponentActivity() {
                                 },
                                 onBack = { navController.popBackStack() },
                                 viewModel = homeViewModel
+                            )
+                        }
+                        composable(
+                            "daily_rewards",
+                            enterTransition = {
+                                slideIntoContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Up,
+                                    animationSpec = tween(300, easing = FastOutSlowInEasing)
+                                ) + fadeIn(animationSpec = tween(300))
+                            },
+                            exitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                                ) + fadeOut(animationSpec = tween(250))
+                            },
+                            popExitTransition = {
+                                slideOutOfContainer(
+                                    towards = AnimatedContentTransitionScope.SlideDirection.Down,
+                                    animationSpec = tween(250, easing = FastOutSlowInEasing)
+                                ) + fadeOut(animationSpec = tween(250))
+                            }
+                        ) {
+                            val rewardState by homeViewModel.uiState.collectAsState()
+                            LaunchedEffect(Unit) {
+                                homeViewModel.openDailyRewards()
+                            }
+                            DailyRewardScreen(
+                                streak = rewardState.dailyRewardStreak,
+                                coins = rewardState.dailyRewardCoins,
+                                isAlreadyClaimed = rewardState.isDailyRewardClaimedToday,
+                                onClaim = { homeViewModel.claimDailyReward() },
+                                onBack = {
+                                    homeViewModel.dismissDailyReward()
+                                    navController.popBackStack()
+                                }
                             )
                         }
 
@@ -506,7 +542,7 @@ fun SudokuHomeScreen(
     onStartGame: (Difficulty, Boolean) -> Unit,
     onContinueGame: (Difficulty, Boolean) -> Unit,
     onDailyChallenge: () -> Unit = {},
-
+    onDailyRewards: () -> Unit = {},
     onViewProfile: () -> Unit,
     onSettings: () -> Unit,
     onShop: () -> Unit,
@@ -530,15 +566,7 @@ fun SudokuHomeScreen(
         viewModel.checkDailyReward()
     }
     
-    if (uiState.showDailyReward) {
-        DailyRewardDialog(
-            streak = uiState.dailyRewardStreak,
-            coins = uiState.dailyRewardCoins,
-            isAlreadyClaimed = uiState.isDailyRewardClaimedToday,
-            onClaim = { viewModel.claimDailyReward() },
-            onDismiss = { viewModel.dismissDailyReward() }
-        )
-    }
+    // Daily reward dialog removed — now a full-screen route via "daily_rewards"
 
     Column(
         modifier = Modifier
@@ -558,7 +586,7 @@ fun SudokuHomeScreen(
         ) {
             // Calendar / Daily Rewards Button on the left
             Surface(
-                onClick = { viewModel.openDailyRewards() },
+                onClick = { onDailyRewards() },
                 color = MaterialTheme.colorScheme.surface,
                 shape = CircleShape,
                 shadowElevation = 3.dp,
