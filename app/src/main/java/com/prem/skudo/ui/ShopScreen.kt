@@ -21,6 +21,7 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,14 +50,66 @@ fun ShopScreen(
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    LaunchedEffect(uiState.purchaseSuccess, uiState.errorMessage) {
-        if (uiState.purchaseSuccess) {
-            snackbarHostState.showSnackbar("Purchase successful!")
-            viewModel.clearMessages()
-        } else if (uiState.errorMessage != null) {
+    LaunchedEffect(uiState.errorMessage) {
+        if (uiState.errorMessage != null) {
             snackbarHostState.showSnackbar(uiState.errorMessage!!)
             viewModel.clearMessages()
         }
+    }
+
+    // Purchase Successful Pop-up Dialog
+    if (uiState.purchaseSuccess) {
+        AlertDialog(
+            onDismissRequest = { viewModel.clearMessages() },
+            icon = {
+                Box(
+                    modifier = Modifier
+                        .size(60.dp)
+                        .background(EasyGreen.copy(alpha = 0.15f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CheckCircle,
+                        contentDescription = null,
+                        tint = EasyGreen,
+                        modifier = Modifier.size(36.dp)
+                    )
+                }
+            },
+            title = {
+                Text(
+                    text = "Purchase Successful!",
+                    style = MaterialTheme.typography.titleLarge,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center
+                )
+            },
+            text = {
+                Text(
+                    text = "Your purchase has been completed successfully and applied to your account.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = TextMuted,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                Button(
+                    onClick = { viewModel.clearMessages() },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(
+                        text = "AWESOME!",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 16.sp
+                    )
+                }
+            },
+            shape = RoundedCornerShape(24.dp),
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     }
 
     Scaffold(
