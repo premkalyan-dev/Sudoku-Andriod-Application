@@ -556,8 +556,8 @@ fun SudokuHomeScreen(
     }
 
     LaunchedEffect(Unit) {
-        viewModel.loadStats()
-        viewModel.checkDailyReward()
+        // viewModel.loadStats() - No longer needed, handled in init block of HomeViewModel
+        // viewModel.checkDailyReward() - Open daily rewards manually or handled in HomeViewModel
     }
     
     // Daily reward dialog removed — now a full-screen route via "daily_rewards"

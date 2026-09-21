@@ -22,9 +22,3 @@
 # Keep Coroutines & Flow
 -keepnames class kotlinx.coroutines.internal.MainDispatcherFactory {}
 -keepnames class kotlinx.coroutines.CoroutineExceptionHandler {}
-
-# Keep Firebase
--keepattributes Signature
--keepattributes InnerClasses
--dontwarn com.google.firebase.**
--keep class com.google.firebase.** { *; }

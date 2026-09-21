@@ -801,10 +801,10 @@
           <div>
             <strong>Core Privacy Highlights:</strong>
             <ul style="margin: 8px 0 0 16px;">
-              <li><strong>You can play offline:</strong> Skudo does not require an account to enjoy basic Sudoku gameplay. Offline play stores puzzles locally on your device.</li>
-              <li><strong>Optional Google Sign-In:</strong> You may sign in with Google to enable cloud sync, preserve your level/coins/gems, and restore purchases across devices.</li>
-              <li><strong>We NEVER sell your data:</strong> Your information is never sold, leased, or rented to data brokers or advertising exchanges.</li>
-              <li><strong>Direct Data Deletion:</strong> You can delete your account and all associated cloud data at any time directly through the app or by submitting a web request on this page.</li>
+              <li><strong>100% Offline &amp; Private:</strong> Skudo does not require any account, login, or internet connection to play. All puzzle progress and stats are stored strictly locally on your device.</li>
+              <li><strong>Zero Personal Data Collected:</strong> We do NOT collect, transmit, or share your name, email address, phone number, location, or device identifiers.</li>
+              <li><strong>No Firebase or Third-Party Tracking:</strong> The app does not include Firebase, analytics SDKs, advertising SDKs, or third-party trackers.</li>
+              <li><strong>Total Data Control:</strong> You can wipe all game data at any time by clearing the app data in your device settings or uninstalling the app.</li>
             </ul>
           </div>
         </div>
@@ -814,49 +814,36 @@
       <section id="data-collected" class="policy-card">
         <h2><span class="section-num">3</span> Information We Collect</h2>
         <p>
-          Depending on whether you play as a guest or sign in with an account, we collect the following categories of data:
+          <strong>Skudo does not collect or transmit any personal information to external servers.</strong> The app functions entirely locally on your device.
         </p>
 
-        <h3>A. Account Information (Optional via Google Sign-In)</h3>
+        <h3>A. Local Gameplay Data (Stored on Your Device Only)</h3>
         <p>
-          If you choose to sign in to sync your progress across devices, we use <strong>Firebase Authentication</strong> and <strong>Google Identity Services</strong>. We collect:
+          The following game state information is saved strictly within local device storage (Android SQLite Room Database and Jetpack DataStore) so you can resume your games:
         </p>
         <ul>
-          <li><strong>Display Name:</strong> To personalize your user profile and leaderboard ranking.</li>
-          <li><strong>Email Address:</strong> Associated with your Google account for authentication and account identity.</li>
-          <li><strong>Google User ID:</strong> A unique cryptographic identifier supplied by Google to associate your game data.</li>
-          <li><strong>Profile Photo URL:</strong> (Optional) Displayed in your in-game profile header if provided by Google.</li>
+          <li><strong>Puzzles &amp; Statistics:</strong> Puzzles completed, win streaks, best solve times, and difficulty records.</li>
+          <li><strong>Player Progression:</strong> In-game level, earned coins, and gems.</li>
+          <li><strong>Settings &amp; Customizations:</strong> Selected accent color, audio/haptics preferences, and hint counts.</li>
+          <li><strong>Saved Games:</strong> Board state, entered digits, pencil marks, and timer of active games.</li>
         </ul>
 
-        <h3>B. Gameplay &amp; Progress Data (Cloud Firestore)</h3>
-        <p>
-          When signed in, your game progression is synchronized with <strong>Google Cloud Firestore</strong> to prevent progress loss:
-        </p>
+        <h3>B. Information We DO NOT Collect</h3>
         <ul>
-          <li><strong>Puzzles &amp; Statistics:</strong> Puzzles completed, win streaks, best solve times, mistakes made, and difficulty level records.</li>
-          <li><strong>Player Progression:</strong> XP (experience points), player level, earned rank, in-game coins, and gems.</li>
-          <li><strong>Inventory &amp; Purchases:</strong> Unlocked game themes, available hints, and shop inventory items.</li>
-          <li><strong>Saved Game State:</strong> Board layout, pencil notes, and elapsed timer of an in-progress game so you can resume anytime.</li>
-        </ul>
-
-        <h3>C. Device &amp; Technical Information</h3>
-        <p>
-          Standard diagnostics required by the Android operating system and Google Play Services:
-        </p>
-        <ul>
-          <li>Android OS version, device model, app version (e.g., Version 3.0, API Level 36), and system language for proper localization and rendering.</li>
+          <li>No personal identification (name, email address, physical address, phone number).</li>
+          <li>No device advertising IDs (AAID), hardware serial numbers, or IMEI.</li>
+          <li>No precise or approximate geolocation data.</li>
+          <li>No user photos, contacts, camera access, or microphone recordings.</li>
         </ul>
       </section>
 
       <!-- Section 4: Data Usage -->
       <section id="data-usage" class="policy-card">
-        <h2><span class="section-num">4</span> How We Use Your Information</h2>
-        <p>We process your data solely for legitimate, user-facing operational purposes:</p>
+        <h2><span class="section-num">4</span> How Information is Used</h2>
+        <p>Because no data leaves your device, local information is processed solely by your device's processor for gameplay:</p>
         <ul>
-          <li><strong>Game Functionality:</strong> Generating Sudoku boards, validating inputs, tracking hints, calculating mistake limits, and persisting saved games.</li>
-          <li><strong>Cross-Device Synchronization:</strong> Backing up your achievements, gems, unlocked themes, and stats to your linked Google account so you never lose progress.</li>
-          <li><strong>Authentication &amp; Security:</strong> Verifying your identity through Google Sign-In, protecting against fraudulent account actions, and maintaining database integrity.</li>
-          <li><strong>Haptic Feedback:</strong> Enhancing the interactive gameplay feel (vibrations on cell taps or mistakes) via device hardware.</li>
+          <li><strong>Game Functionality:</strong> Generating Sudoku puzzles, checking solution validity, managing undo/redo stacks, and persisting saved games.</li>
+          <li><strong>Haptic Feedback:</strong> Providing subtle tactile vibrations when tapping cells or numbers (can be toggled in Settings).</li>
         </ul>
       </section>
 
@@ -864,7 +851,7 @@
       <section id="data-safety" class="policy-card">
         <h2><span class="section-num">5</span> Google Play Data Safety Matrix</h2>
         <p>
-          The table below reflects our exact disclosures submitted to the <strong>Google Play Console Data Safety</strong> section:
+          The table below reflects our exact disclosures for the <strong>Google Play Console Data Safety</strong> declaration:
         </p>
 
         <div class="table-container">
@@ -874,43 +861,38 @@
                 <th>Data Category</th>
                 <th>Data Types</th>
                 <th>Collection Status</th>
-                <th>Purpose</th>
-                <th>Encrypted in Transit</th>
-                <th>Deletion Available</th>
+                <th>Storage Location</th>
+                <th>Shared with 3rd Parties</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td><strong>Personal Info</strong></td>
-                <td>Name, Email, Google User ID</td>
-                <td><span class="badge badge-optional">Optional (Google Sign-In)</span></td>
-                <td>Account Management &amp; Cloud Sync</td>
-                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
-                <td>Yes</td>
+                <td>Name, Email, Phone, User IDs</td>
+                <td><span class="badge badge-optional">Not Collected</span></td>
+                <td>None</td>
+                <td>No</td>
               </tr>
               <tr>
                 <td><strong>App Activity</strong></td>
-                <td>Gameplay stats, solved puzzles, scores, streak</td>
-                <td><span class="badge badge-collected">Collected</span></td>
-                <td>Game functionality &amp; analytics</td>
-                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
-                <td>Yes</td>
+                <td>Gameplay stats, solved puzzles, scores</td>
+                <td><span class="badge badge-optional">Stored Locally Only</span></td>
+                <td>On-device (SQLite / DataStore)</td>
+                <td>No</td>
               </tr>
               <tr>
-                <td><strong>Financial / Virtual Items</strong></td>
-                <td>In-game coins, gems balance, purchased themes</td>
-                <td><span class="badge badge-optional">Optional (When signed in)</span></td>
-                <td>Virtual shop &amp; inventory tracking</td>
-                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
-                <td>Yes</td>
+                <td><strong>Financial Info</strong></td>
+                <td>Payment details, credit card, bank info</td>
+                <td><span class="badge badge-optional">Not Collected</span></td>
+                <td>None</td>
+                <td>No</td>
               </tr>
               <tr>
                 <td><strong>Device / Other IDs</strong></td>
-                <td>Firebase Instance ID, OS version</td>
-                <td><span class="badge badge-collected">Collected</span></td>
-                <td>App stability &amp; service delivery</td>
-                <td><span class="badge badge-encrypted">Yes (HTTPS/TLS)</span></td>
-                <td>Yes</td>
+                <td>Advertising ID, Android ID, Device IMEI</td>
+                <td><span class="badge badge-optional">Not Collected</span></td>
+                <td>None</td>
+                <td>No</td>
               </tr>
             </tbody>
           </table>
@@ -921,7 +903,7 @@
       <section id="device-permissions" class="policy-card">
         <h2><span class="section-num">6</span> Device Permissions</h2>
         <p>
-          Skudo adheres to the principle of least privilege. The app requests only the minimum permissions necessary for gameplay:
+          Skudo adheres strictly to minimal permissions. The only permission requested is:
         </p>
 
         <div class="table-container">
@@ -937,17 +919,7 @@
               <tr>
                 <td><code>android.permission.VIBRATE</code></td>
                 <td>Normal</td>
-                <td>Used strictly to provide haptic feedback when you tap numbers, toggle notes, or enter a number. You can toggle haptics on or off in the game settings.</td>
-              </tr>
-              <tr>
-                <td><code>android.permission.INTERNET</code></td>
-                <td>Normal</td>
-                <td>Required to securely communicate with Firebase Authentication and Google Cloud Firestore for profile sync.</td>
-              </tr>
-              <tr>
-                <td><code>android.permission.ACCESS_NETWORK_STATE</code></td>
-                <td>Normal</td>
-                <td>Detects network availability so the app can gracefully queue updates locally when playing offline.</td>
+                <td>Provides tactile feedback when tapping numbers or entering moves. This can be enabled or disabled at any time in Settings.</td>
               </tr>
             </tbody>
           </table>
@@ -955,7 +927,7 @@
         <div class="notice-box notice-success">
           <span class="notice-icon">🔒</span>
           <div>
-            <strong>No Sensitive Permissions:</strong> Skudo does <em>NOT</em> access your location (GPS), camera, microphone, contacts, SMS, or external storage files.
+            <strong>No Sensitive Permissions:</strong> Skudo does <em>NOT</em> request camera, microphone, contacts, location (GPS), SMS, or external storage permissions.
           </div>
         </div>
       </section>
@@ -964,127 +936,45 @@
       <section id="third-parties" class="policy-card">
         <h2><span class="section-num">7</span> Third-Party Service Providers</h2>
         <p>
-          We rely on trusted third-party infrastructure services provided by Google LLC. These providers process data according to strict confidentiality agreements:
+          Skudo contains <strong>no third-party SDKs, no advertising networks, and no telemetry/analytics services</strong>. The app operates completely stand-alone.
         </p>
-
-        <div class="sdk-grid">
-          <div class="sdk-card">
-            <div>
-              <div class="sdk-header">
-                <span class="sdk-name">Google Play Services</span>
-              </div>
-              <p class="sdk-purpose">Provides core Android API functionality, Google Play billing/verification, and security integrity.</p>
-            </div>
-            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Google Privacy Policy &rarr;</a>
-          </div>
-
-          <div class="sdk-card">
-            <div>
-              <div class="sdk-header">
-                <span class="sdk-name">Firebase Authentication</span>
-              </div>
-              <p class="sdk-purpose">Handles secure, federated Google Sign-In authentication without storing passwords on our servers.</p>
-            </div>
-            <a href="https://firebase.google.com/support/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Firebase Privacy Policy &rarr;</a>
-          </div>
-
-          <div class="sdk-card">
-            <div>
-              <div class="sdk-header">
-                <span class="sdk-name">Google Cloud Firestore</span>
-              </div>
-              <p class="sdk-purpose">NoSQL cloud database that securely stores and synchronizes user profiles, puzzle progress, and shop inventories.</p>
-            </div>
-            <a href="https://cloud.google.com/security/privacy" target="_blank" rel="noopener noreferrer" class="sdk-link">Google Cloud Privacy &rarr;</a>
-          </div>
-        </div>
       </section>
 
       <!-- Section 8: Data Retention -->
       <section id="data-retention" class="policy-card">
-        <h2><span class="section-num">8</span> Data Retention</h2>
+        <h2><span class="section-num">8</span> Data Retention &amp; Deletion</h2>
         <p>
-          We retain your data only as long as necessary to provide you with the game service:
+          All data is stored locally on your device in your private app sandbox.
         </p>
         <ul>
-          <li><strong>Local Data:</strong> Stored in your device's local storage (Room Database and DataStore). You can clear this anytime by clearing the app's cache/storage or uninstalling the app.</li>
-          <li><strong>Cloud Data:</strong> Retained in Firebase Firestore as long as your account is active. If your account is inactive for more than 24 months, or upon receiving your deletion request, your profile and game records are permanently deleted.</li>
+          <li><strong>Local Persistence:</strong> Data remains on your device for as long as you have the app installed.</li>
+          <li><strong>Data Deletion:</strong> You have full control over your data. To permanently delete all saved games, stats, and preferences, simply clear the app's storage in your Android device settings (<em>Settings &gt; Apps &gt; Skudo &gt; Storage &gt; Clear Storage / Clear Data</em>) or uninstall the application.</li>
         </ul>
       </section>
 
-      <!-- Section 9: Account & Data Deletion (Play Store Requirement) -->
-      <section id="data-deletion" class="policy-card">
-        <h2><span class="section-num">9</span> Account &amp; Data Deletion Policy</h2>
-        <p>
-          In full accordance with Google Play's <strong>Account Deletion and Data Safety Requirements</strong>, any user who creates an account via Google Sign-In has the right to request the permanent deletion of their account and all associated personal data.
-        </p>
-
-        <div class="notice-box notice-warning">
-          <span class="notice-icon">⚠️</span>
-          <div>
-            <strong>What happens when you delete your account:</strong>
-            <ul style="margin: 6px 0 0 16px;">
-              <li>Your Firebase Authentication record is deleted.</li>
-              <li>Your Cloud Firestore user profile, stats, level, XP, coins, and gems are permanently purged.</li>
-              <li>All unlocked themes and hint inventories will be revoked and cannot be recovered.</li>
-            </ul>
-          </div>
-        </div>
-
-        <h3>How to Request Account &amp; Data Deletion</h3>
-        <p>You may initiate deletion via either of the following methods:</p>
-
-        <ol>
-          <li>
-            <strong>In-App Deletion:</strong>
-            Navigate to the in-game Settings/Profile menu in Skudo, tap <strong>"Sign Out &amp; Clear Cloud Data"</strong>.
-          </li>
-          <li>
-            <strong>Web-Based Request (Google Play Mandated):</strong>
-            Use the deletion form below or email us directly at <a href="mailto:premkalyan2727@gmail.com" style="color: var(--accent-primary);">premkalyan2727@gmail.com</a> with the subject <code>Skudo Data Deletion Request</code>.
-          </li>
-        </ol>
-
-        <!-- Interactive Deletion Form -->
-        <div class="deletion-box">
-          <h3 style="margin-top: 0; margin-bottom: 12px;">Submit Web Data Deletion Request</h3>
-          <p style="font-size: 0.88rem; margin-bottom: 16px;">
-            Enter the Google Email address linked with your Skudo game account. This will compose a pre-formatted deletion request directly to the developer:
-          </p>
-          <div class="form-group">
-            <label class="form-label" for="userEmailInput">Your Registered Google Email:</label>
-            <input type="email" id="userEmailInput" class="form-input" placeholder="e.g. yourname@gmail.com" required>
-          </div>
-          <button type="button" class="btn btn-primary" id="submitDeletionBtn">
-            Generate Deletion Request Email
-          </button>
-          <p id="deletionSuccessMsg" style="display: none; color: var(--success); font-size: 0.85rem; margin-top: 10px; font-weight: 600;">
-            ✓ Email client opened! Send the email to finalize your deletion request. Deletion is completed within 30 days.
-          </p>
-        </div>
-      </section>
-
-      <!-- Section 10: Children's Privacy -->
+      <!-- Section 9: Children's Privacy -->
       <section id="children" class="policy-card">
-        <h2><span class="section-num">10</span> Children's Privacy (COPPA)</h2>
+        <h2><span class="section-num">9</span> Children's Privacy (COPPA)</h2>
         <p>
-          Skudo is a general audience logic puzzle game designed for users of all ages. We do not knowingly collect, solicit, or store personal information from children under the age of 13 (or under 16 in the European Union) without verifiable parental consent.
-        </p>
-        <p>
-          If you are a parent or guardian and become aware that your child has provided us with personal information via Google Sign-In without your consent, please contact us immediately at <a href="mailto:premkalyan2727@gmail.com" style="color: var(--accent-primary);">premkalyan2727@gmail.com</a>. Upon verification, we will promptly delete such information from our servers.
+          Skudo is a family-safe logic puzzle game. Because Skudo does not collect, transmit, or share any personal information from any user, it is fully compliant with the Children's Online Privacy Protection Act (COPPA) and GDPR-K.
         </p>
       </section>
 
-      <!-- Section 11: Security & Encryption -->
+      <!-- Section 10: Security -->
       <section id="security" class="policy-card">
-        <h2><span class="section-num">11</span> Security &amp; Encryption Standards</h2>
+        <h2><span class="section-num">10</span> Security Standards</h2>
         <p>
-          We implement rigorous technical and organizational security measures to protect your information:
+          Because Skudo does not transmit personal data across the internet or operate external databases, your information is protected by Android's built-in application sandboxing security model.
         </p>
+      </section>
+
+      <!-- Section 11: User Rights -->
+      <section id="user-rights" class="policy-card">
+        <h2><span class="section-num">11</span> Your Rights (GDPR &amp; CCPA/CPRA)</h2>
+        <p>Under applicable global privacy laws, you have full control over your data:</p>
         <ul>
-          <li><strong>Encryption in Transit:</strong> All network communication between the Skudo app and Firebase/Google Cloud is encrypted using industry-standard <strong>Transport Layer Security (TLS/HTTPS)</strong> protocols.</li>
-          <li><strong>Database Access Rules:</strong> Firebase Firestore security rules restrict database access so that each player can only view and update their own authorized player profile.</li>
-          <li><strong>No Plaintext Passwords:</strong> We do not manage, store, or have access to passwords; authentication is delegated entirely to Google Identity Services.</li>
+          <li><strong>Right to Erasure / Deletion:</strong> You can delete all your data instantly at any time by clearing the app's storage or uninstalling the app.</li>
+          <li><strong>Right to Privacy:</strong> Since no personal data is collected or shared with third parties, your privacy is completely safeguarded by design.</li>
         </ul>
       </section>
 
@@ -1172,37 +1062,17 @@
 
     // Copy Email Handler
     const copyEmailBtn = document.getElementById('copyEmailBtn');
-    copyEmailBtn.addEventListener('click', () => {
-      navigator.clipboard.writeText('premkalyan2727@gmail.com').then(() => {
-        const origText = copyEmailBtn.innerText;
-        copyEmailBtn.innerText = '✓ Copied to Clipboard!';
-        setTimeout(() => {
-          copyEmailBtn.innerText = origText;
-        }, 2500);
+    if (copyEmailBtn) {
+      copyEmailBtn.addEventListener('click', () => {
+        navigator.clipboard.writeText('premkalyan2727@gmail.com').then(() => {
+          const origText = copyEmailBtn.innerText;
+          copyEmailBtn.innerText = '✓ Copied to Clipboard!';
+          setTimeout(() => {
+            copyEmailBtn.innerText = origText;
+          }, 2500);
+        });
       });
-    });
-
-    // Data Deletion Request Mailto Generator
-    const submitDeletionBtn = document.getElementById('submitDeletionBtn');
-    const userEmailInput = document.getElementById('userEmailInput');
-    const deletionSuccessMsg = document.getElementById('deletionSuccessMsg');
-
-    submitDeletionBtn.addEventListener('click', () => {
-      const email = userEmailInput.value.trim();
-      const subject = encodeURIComponent('[Skudo] Account & Data Deletion Request');
-      const body = encodeURIComponent(
-        `Dear Skudo Support,\n\n` +
-        `I am formally requesting the permanent deletion of my Skudo game account and all associated cloud data in accordance with Google Play data safety policies.\n\n` +
-        `Account Details:\n` +
-        `- App: Skudo (com.prem.skudo)\n` +
-        `- Registered Google Account Email: ${email || '[Enter your email here]'}\n\n` +
-        `Please confirm once all Firestore profile records, authentication credentials, and gameplay statistics have been purged.\n\n` +
-        `Thank you.`
-      );
-
-      window.location.href = `mailto:premkalyan2727@gmail.com?subject=${subject}&body=${body}`;
-      deletionSuccessMsg.style.display = 'block';
-    });
+    }
 
     // Scroll spy for Table of Contents
     const sections = document.querySelectorAll('.policy-card');

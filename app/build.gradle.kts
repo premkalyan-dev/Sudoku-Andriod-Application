@@ -5,7 +5,6 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.ksp)
-    id("com.google.gms.google-services")
 }
 
 val keystorePropertiesFile = rootProject.file("keystore.properties")
@@ -22,8 +21,8 @@ android {
         applicationId = "com.prem.skudo"
         minSdk = 24
         targetSdk = 36
-        versionCode = 5
-        versionName = "5.0"
+        versionCode = 6
+        versionName = "6.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -84,16 +83,6 @@ dependencies {
     implementation(libs.viewmodel.compose)
     implementation(libs.icons.extended)
 
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.auth)
-    implementation(libs.firebase.firestore)
-
-    // Credentials / Google Sign-In
-    implementation(libs.androidx.credentials)
-    implementation(libs.androidx.credentials.auth)
-    implementation(libs.googleid)
-    
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)

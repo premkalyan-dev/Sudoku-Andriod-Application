@@ -12,14 +12,9 @@ import kotlinx.coroutines.launch
 
 import com.prem.skudo.database.UserProfile
 import com.prem.skudo.repository.UserRepository
-import com.prem.skudo.repository.AuthRepository
-import com.prem.skudo.repository.CloudSyncRepository
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import androidx.compose.runtime.Immutable
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
@@ -31,9 +26,6 @@ data class HomeState(
     val hardStats: GameStats? = null,
     val expertStats: GameStats? = null,
     val userProfile: UserProfile? = null,
-    val currentUser: FirebaseUser? = null,
-    val isSyncing: Boolean = false,
-    val syncError: String? = null,
     val dailyStreak: Int = 0,
     val lastChallengeDate: Int = 0,
     val hasSavedGame: Boolean = false,
@@ -64,36 +56,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = SudokuRepository(application)
     private val userRepository = UserRepository(application)
     private val rewardRepository = com.prem.skudo.repository.RewardRepository(application)
-    private val authRepository = AuthRepository(application)
-    private val syncRepository = CloudSyncRepository(application)
     
     private val _uiState = MutableStateFlow(HomeState())
     val uiState = _uiState.asStateFlow()
 
     init {
         loadStats()
-
-        viewModelScope.launch {
-            authRepository.currentUser.collect { user ->
-                _uiState.update { it.copy(currentUser = user) }
-                if (user != null) {
-                    performCloudSync(user.uid)
-                }
-            }
-        }
         
         userRepository.userProfile
             .filterNotNull()
             .onEach { profile ->
                 val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
                 _uiState.update { it.copy(userProfile = profile, isDailyRewardClaimedToday = claimed) }
-            }
-            // Debounce sync triggers to avoid excessive writes
-            .distinctUntilChangedBy { it.updatedAt }
-            .onEach { profile ->
-                if (profile.cloudUserId != null) {
-                    performCloudSync(profile.cloudUserId)
-                }
             }
             .launchIn(viewModelScope)
 
@@ -113,76 +87,37 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             repository.savedGames.collect { savedGames ->
-                _uiState.update { it.copy(
-                    hasSavedGame = savedGames.isNotEmpty(),
-                    latestSavedGame = savedGames.firstOrNull()
-                ) }
+                val latest = savedGames.firstOrNull()
+                _uiState.update { state ->
+                    state.copy(
+                        hasSavedGame = latest != null,
+                        latestSavedGame = latest
+                    )
+                }
             }
         }
     }
 
-    fun loadStats() {
+    private fun loadStats() {
         viewModelScope.launch {
-            val latestSaved = repository.getLatestSavedGame()
-            userRepository.getOrCreateProfile() // Ensure profile exists
-            
             val easy = repository.getStats(Difficulty.EASY)
             val medium = repository.getStats(Difficulty.MEDIUM)
             val hard = repository.getStats(Difficulty.HARD)
             val expert = repository.getStats(Difficulty.EXPERT)
-            
-            _uiState.update { it.copy(
-                easyStats = easy,
-                mediumStats = medium,
-                hardStats = hard,
-                expertStats = expert,
-                dailyStreak = repository.dailyStreak.first(),
-                lastChallengeDate = repository.lastChallengeDate.first(),
-                hasSavedGame = latestSaved != null,
-                latestSavedGame = latestSaved
-            ) }
-        }
-    }
 
-    fun updateDisplayName(name: String): Boolean {
-        val trimmedName = name.trim()
-        if (trimmedName.length in 3..20) {
-            viewModelScope.launch {
-                userRepository.updateDisplayName(trimmedName)
+            val streak = repository.dailyStreak.first()
+            val lastDate = repository.lastChallengeDate.first()
+
+            _uiState.update { state ->
+                state.copy(
+                    easyStats = easy,
+                    mediumStats = medium,
+                    hardStats = hard,
+                    expertStats = expert,
+                    dailyStreak = streak,
+                    lastChallengeDate = lastDate
+                )
             }
-            return true
-        }
-        return false
-    }
-
-    fun updateAvatar(avatarId: String) {
-        viewModelScope.launch {
-            userRepository.updateAvatar(avatarId)
-        }
-    }
-
-    fun checkDailyReward() {
-        viewModelScope.launch {
-            val profile = userRepository.getOrCreateProfile()
-            val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
-            val streak = if (claimed) {
-                if (profile.dailyRewardStreak > 0) profile.dailyRewardStreak else 1
-            } else {
-                val now = System.currentTimeMillis()
-                val oneDayMillis = 24 * 60 * 60 * 1000L
-                if (profile.lastDailyRewardTimestamp > 0 && now - profile.lastDailyRewardTimestamp < oneDayMillis * 2) {
-                    (profile.dailyRewardStreak % 7) + 1
-                } else {
-                    1
-                }
-            }
-            val coins = rewardRepository.getRewardForDay(streak)
-            _uiState.update { it.copy(
-                isDailyRewardClaimedToday = claimed,
-                dailyRewardCoins = coins,
-                dailyRewardStreak = streak,
-                showDailyReward = !claimed
-            ) }
         }
     }
 
@@ -190,23 +125,18 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val profile = userRepository.getOrCreateProfile()
             val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
-            val streak = if (claimed) {
-                if (profile.dailyRewardStreak > 0) profile.dailyRewardStreak else 1
+            val now = System.currentTimeMillis()
+            val oneDayMillis = 24 * 60 * 60 * 1000L
+            val streak = if (now - profile.lastDailyRewardTimestamp < oneDayMillis * 2) {
+                if (claimed) profile.dailyRewardStreak else (profile.dailyRewardStreak % 7) + 1
             } else {
-                val now = System.currentTimeMillis()
-                val oneDayMillis = 24 * 60 * 60 * 1000L
-                if (profile.lastDailyRewardTimestamp > 0 && now - profile.lastDailyRewardTimestamp < oneDayMillis * 2) {
-                    (profile.dailyRewardStreak % 7) + 1
-                } else {
-                    1
-                }
+                if (claimed) profile.dailyRewardStreak else 1
             }
-            val coins = rewardRepository.getRewardForDay(streak)
             _uiState.update { it.copy(
-                dailyRewardCoins = coins,
+                showDailyReward = true,
+                dailyRewardCoins = profile.coins,
                 dailyRewardStreak = streak,
-                isDailyRewardClaimedToday = claimed,
-                showDailyReward = true
+                isDailyRewardClaimedToday = claimed
             ) }
         }
     }
@@ -215,8 +145,9 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             val result = rewardRepository.claimDailyReward()
             if (result.success) {
+                val profile = userRepository.getOrCreateProfile()
                 _uiState.update { it.copy(
-                    dailyRewardCoins = result.coins,
+                    dailyRewardCoins = profile.coins,
                     dailyRewardStreak = result.streak,
                     isDailyRewardClaimedToday = true
                 ) }
@@ -226,41 +157,5 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissDailyReward() {
         _uiState.update { it.copy(showDailyReward = false) }
-    }
-
-    fun signIn() {
-        viewModelScope.launch {
-            authRepository.signInWithGoogle()
-        }
-    }
-
-    fun signOut() {
-        viewModelScope.launch {
-            authRepository.signOut()
-        }
-    }
-
-    private fun performCloudSync(uid: String) {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isSyncing = true, syncError = null) }
-            try {
-                // Update local profile with cloud info if missing
-                val user = authRepository.currentUser.value
-                val profile = userRepository.getOrCreateProfile()
-                if (profile.cloudUserId == null && user != null) {
-                    userRepository.updateProfileInfo(
-                        email = user.email,
-                        photoUrl = user.photoUrl?.toString(),
-                        cloudUserId = user.uid,
-                        displayName = user.displayName ?: profile.displayName
-                    )
-                }
-
-                syncRepository.syncLocalToCloud(uid)
-                _uiState.update { it.copy(isSyncing = false) }
-            } catch (e: Exception) {
-                _uiState.update { it.copy(isSyncing = false, syncError = e.message) }
-            }
-        }
     }
 }
