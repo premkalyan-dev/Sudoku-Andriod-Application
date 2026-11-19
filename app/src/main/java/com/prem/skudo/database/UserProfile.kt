@@ -51,6 +51,8 @@ data class UserProfile(
     // Daily Rewards
     val lastDailyRewardTimestamp: Long = 0,
     val dailyRewardStreak: Int = 0,
+    val lastDailyClaimDate: String? = null,
+    val dailyRewardCycleDay: Int = 1,
     
     // Future Cloud Support
     val cloudUserId: String? = null,

@@ -102,7 +102,7 @@ interface DailyChallengeDao {
     fun getCompletedChallenges(): Flow<List<DailyChallenge>>
 }
 
-@Database(entities = [GameStats::class, SavedGame::class, UserProfile::class, Achievement::class, GameHistory::class, DailyChallenge::class], version = 10, exportSchema = false)
+@Database(entities = [GameStats::class, SavedGame::class, UserProfile::class, Achievement::class, GameHistory::class, DailyChallenge::class, DailyClaimHistory::class, MysteryGift::class], version = 11, exportSchema = false)
 @TypeConverters(DifficultyConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun statsDao(): StatsDao
@@ -111,6 +111,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun achievementDao(): AchievementDao
     abstract fun historyDao(): HistoryDao
     abstract fun dailyChallengeDao(): DailyChallengeDao
+    abstract fun dailyRewardDao(): DailyRewardDao
 
     companion object {
         @Volatile
@@ -123,11 +124,46 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "sudoku_database"
                 )
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
                 .fallbackToDestructiveMigration(true)
                 .build()
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        private val MIGRATION_10_11 = object : androidx.room.migration.Migration(10, 11) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS daily_claim_history (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        userId TEXT NOT NULL,
+                        claimDate TEXT NOT NULL,
+                        overallStreak INTEGER NOT NULL,
+                        rewardCycleDay INTEGER NOT NULL,
+                        rewardType TEXT NOT NULL,
+                        rewardAmount INTEGER NOT NULL,
+                        claimTimestamp INTEGER NOT NULL
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_daily_claim_history_userId_claimDate ON daily_claim_history (userId, claimDate)")
+
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS mystery_gifts (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        userId TEXT NOT NULL,
+                        claimDate TEXT NOT NULL,
+                        selectedHints INTEGER NOT NULL,
+                        creditedHints INTEGER NOT NULL,
+                        status TEXT NOT NULL,
+                        createdAt INTEGER NOT NULL,
+                        revealedAt INTEGER
+                    )
+                """.trimIndent())
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_mystery_gifts_userId_claimDate ON mystery_gifts (userId, claimDate)")
+
+                ensureColumnExists(db, "user_profile", "lastDailyClaimDate", "TEXT")
+                ensureColumnExists(db, "user_profile", "dailyRewardCycleDay", "INTEGER NOT NULL DEFAULT 1")
             }
         }
 

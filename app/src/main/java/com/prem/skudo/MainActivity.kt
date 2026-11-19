@@ -269,10 +269,17 @@ class MainActivity : ComponentActivity() {
                                 homeViewModel.openDailyRewards()
                             }
                             DailyRewardScreen(
+                                dailyRewardInfo = rewardState.dailyRewardInfo,
                                 streak = rewardState.dailyRewardStreak,
                                 coins = rewardState.dailyRewardCoins,
                                 isAlreadyClaimed = rewardState.isDailyRewardClaimedToday,
+                                isClaiming = rewardState.isClaimingReward,
+                                isOpeningGift = rewardState.isOpeningGift,
+                                rewardMessage = rewardState.rewardMessage,
+                                mysteryGiftResult = rewardState.mysteryGiftResult,
                                 onClaim = { homeViewModel.claimDailyReward() },
+                                onOpenGift = { giftId -> homeViewModel.openMysteryGift(giftId) },
+                                onDismissMessage = { homeViewModel.clearRewardMessage() },
                                 onBack = {
                                     homeViewModel.dismissDailyReward()
                                     navController.popBackStack()

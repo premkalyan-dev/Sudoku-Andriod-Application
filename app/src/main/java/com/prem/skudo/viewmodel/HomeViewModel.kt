@@ -15,6 +15,8 @@ import com.prem.skudo.repository.UserRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import androidx.compose.runtime.Immutable
+import com.prem.skudo.repository.DailyRewardInfo
+import com.prem.skudo.repository.OpenMysteryGiftResult
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
@@ -35,7 +37,12 @@ data class HomeState(
     val dailyRewardCoins: Long = 0,
     val dailyRewardStreak: Int = 0,
     val showDailyReward: Boolean = false,
-    val isDailyRewardClaimedToday: Boolean = false
+    val isDailyRewardClaimedToday: Boolean = false,
+    val dailyRewardInfo: DailyRewardInfo? = null,
+    val isClaimingReward: Boolean = false,
+    val isOpeningGift: Boolean = false,
+    val rewardMessage: String? = null,
+    val mysteryGiftResult: OpenMysteryGiftResult? = null
 ) {
     val bestOverallStats: GameStats? by lazy {
         listOfNotNull(easyStats, mediumStats, hardStats, expertStats)
@@ -66,8 +73,16 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
         userRepository.userProfile
             .filterNotNull()
             .onEach { profile ->
-                val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
-                _uiState.update { it.copy(userProfile = profile, isDailyRewardClaimedToday = claimed) }
+                val info = rewardRepository.getDailyRewardInfo()
+                _uiState.update {
+                    it.copy(
+                        userProfile = profile,
+                        dailyRewardInfo = info,
+                        isDailyRewardClaimedToday = info.isClaimedToday,
+                        dailyRewardCoins = profile.coins,
+                        dailyRewardStreak = info.currentStreak
+                    )
+                }
             }
             .launchIn(viewModelScope)
 
@@ -123,39 +138,60 @@ class HomeViewModel(application: Application) : AndroidViewModel(application) {
 
     fun openDailyRewards() {
         viewModelScope.launch {
-            val profile = userRepository.getOrCreateProfile()
-            val claimed = rewardRepository.isClaimedToday(profile.lastDailyRewardTimestamp)
-            val now = System.currentTimeMillis()
-            val oneDayMillis = 24 * 60 * 60 * 1000L
-            val streak = if (now - profile.lastDailyRewardTimestamp < oneDayMillis * 2) {
-                if (claimed) profile.dailyRewardStreak else (profile.dailyRewardStreak % 7) + 1
-            } else {
-                if (claimed) profile.dailyRewardStreak else 1
+            val info = rewardRepository.getDailyRewardInfo()
+            _uiState.update {
+                it.copy(
+                    showDailyReward = true,
+                    dailyRewardInfo = info,
+                    dailyRewardCoins = info.walletBalance,
+                    dailyRewardStreak = info.currentStreak,
+                    isDailyRewardClaimedToday = info.isClaimedToday
+                )
             }
-            _uiState.update { it.copy(
-                showDailyReward = true,
-                dailyRewardCoins = profile.coins,
-                dailyRewardStreak = streak,
-                isDailyRewardClaimedToday = claimed
-            ) }
         }
     }
 
     fun claimDailyReward() {
         viewModelScope.launch {
+            if (_uiState.value.isClaimingReward) return@launch
+            _uiState.update { it.copy(isClaimingReward = true) }
             val result = rewardRepository.claimDailyReward()
-            if (result.success) {
-                val profile = userRepository.getOrCreateProfile()
-                _uiState.update { it.copy(
-                    dailyRewardCoins = profile.coins,
-                    dailyRewardStreak = result.streak,
-                    isDailyRewardClaimedToday = true
-                ) }
+            val info = rewardRepository.getDailyRewardInfo()
+            _uiState.update {
+                it.copy(
+                    isClaimingReward = false,
+                    dailyRewardInfo = info,
+                    dailyRewardCoins = info.walletBalance,
+                    dailyRewardStreak = info.currentStreak,
+                    isDailyRewardClaimedToday = info.isClaimedToday,
+                    rewardMessage = result.message
+                )
             }
         }
     }
 
+    fun openMysteryGift(giftId: String? = null) {
+        viewModelScope.launch {
+            if (_uiState.value.isOpeningGift) return@launch
+            _uiState.update { it.copy(isOpeningGift = true) }
+            val result = rewardRepository.openMysteryGift(giftId)
+            val info = rewardRepository.getDailyRewardInfo()
+            _uiState.update {
+                it.copy(
+                    isOpeningGift = false,
+                    dailyRewardInfo = info,
+                    mysteryGiftResult = result,
+                    rewardMessage = result.message
+                )
+            }
+        }
+    }
+
+    fun clearRewardMessage() {
+        _uiState.update { it.copy(rewardMessage = null, mysteryGiftResult = null) }
+    }
+
     fun dismissDailyReward() {
-        _uiState.update { it.copy(showDailyReward = false) }
+        _uiState.update { it.copy(showDailyReward = false, rewardMessage = null, mysteryGiftResult = null) }
     }
 }
