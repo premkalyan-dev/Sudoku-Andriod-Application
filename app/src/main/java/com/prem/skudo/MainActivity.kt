@@ -61,9 +61,15 @@ class MainActivity : ComponentActivity() {
         setContent {
             val settingsViewModel: com.prem.skudo.viewmodel.SettingsViewModel = viewModel()
             val settingsState by settingsViewModel.settingsState.collectAsState()
-            
+            val isSystemDark = isSystemInDarkTheme()
+            val isDarkTheme = when (settingsState.themeMode) {
+                "DARK" -> true
+                "LIGHT" -> false
+                else -> isSystemDark
+            }
+
             SudokuTheme(
-                darkTheme = false,
+                darkTheme = isDarkTheme,
                 accentColorName = settingsState.accentColor
             ) {
                 val navController = rememberNavController()
@@ -828,17 +834,17 @@ fun AchievementsScreen(
                     )
                 }
             } else {
-                Icon(Icons.Default.Lock, null, Modifier.size(80.dp), TextMuted)
+                Icon(Icons.Default.Lock, null, Modifier.size(80.dp), MaterialTheme.colorScheme.onSurfaceVariant)
                 Spacer(Modifier.height(24.dp))
                 Text(
                     "No Achievements Yet",
-                    color = TextDark,
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
                     "Win a game to see your highest score!",
-                    color = TextMuted,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.padding(horizontal = 32.dp)
                 )
@@ -933,7 +939,7 @@ fun DailyChallengeScreen(
             } else {
                 Button(
                     onClick = onStartDaily,
-                    colors = ButtonDefaults.buttonColors(containerColor = PrimaryCyan),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                     shape = RoundedCornerShape(24.dp),
                     modifier = Modifier.height(56.dp).fillMaxWidth(0.7f)
                 ) {

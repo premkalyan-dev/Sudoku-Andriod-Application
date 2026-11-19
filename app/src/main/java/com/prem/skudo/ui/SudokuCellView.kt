@@ -173,7 +173,7 @@ fun SudokuCellNotes(notes: Set<Int>) {
                         fontSize = 9.sp,
                         lineHeight = 9.sp,
                         fontWeight = FontWeight.SemiBold,
-                        color = TextMuted
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }

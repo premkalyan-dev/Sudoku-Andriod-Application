@@ -554,7 +554,7 @@ fun PremiumNumberKey(
 
     val contentColor by animateColorAsState(
         targetValue = when {
-            isCompleted -> TextMuted.copy(alpha = 0.35f)
+            isCompleted -> MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.35f)
             isSelected -> MaterialTheme.colorScheme.onPrimary
             isPressed -> MaterialTheme.colorScheme.onPrimaryContainer
             else -> MaterialTheme.colorScheme.onSurface
@@ -676,7 +676,7 @@ fun CompactActionButton(
         Text(
             text = label.uppercase(),
             fontSize = 9.sp,
-            color = if (active) MaterialTheme.colorScheme.primary else TextMuted,
+            color = if (active) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
             fontWeight = FontWeight.Black,
             letterSpacing = 0.5.sp
         )
@@ -860,7 +860,7 @@ fun ContinueGameDialog(
         },
         dismissButton = {
             TextButton(onClick = onCancel, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.no_thanks), color = TextMuted, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.no_thanks), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
             }
         }
     )
@@ -887,7 +887,7 @@ fun GameOverDialog(maxMistakes: Int, onRestart: () -> Unit, onHome: () -> Unit) 
         },
         dismissButton = {
             TextButton(onClick = onHome, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.exit).uppercase(), color = TextMuted, fontWeight = FontWeight.Bold)
+                Text(stringResource(R.string.exit).uppercase(), color = MaterialTheme.colorScheme.onSurfaceVariant, fontWeight = FontWeight.Bold)
             }
         }
     )

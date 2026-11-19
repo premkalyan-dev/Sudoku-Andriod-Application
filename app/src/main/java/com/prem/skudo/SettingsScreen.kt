@@ -4,6 +4,7 @@ import android.content.Intent
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,6 +16,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
@@ -38,6 +40,24 @@ fun SettingsScreen(
     val homeUiState by homeViewModel.uiState.collectAsState()
     val settingsState by settingsViewModel.settingsState.collectAsState()
     val scrollState = rememberScrollState()
+    var showThemeDialog by remember { mutableStateOf(false) }
+
+    val isSystemDark = isSystemInDarkTheme()
+    val isDarkActive = when (settingsState.themeMode) {
+        "DARK" -> true
+        "LIGHT" -> false
+        else -> isSystemDark
+    }
+
+    if (showThemeDialog) {
+        ThemeSelectionDialog(
+            currentTheme = settingsState.themeMode,
+            onThemeSelected = { mode ->
+                settingsViewModel.updateThemeMode(mode)
+            },
+            onDismiss = { showThemeDialog = false }
+        )
+    }
 
     Scaffold(
         topBar = {
@@ -84,6 +104,45 @@ fun SettingsScreen(
 
             // Appearance Section
             SettingsSection("Appearance") {
+                SettingsToggle(
+                    title = "Dark Theme",
+                    subtitle = when (settingsState.themeMode) {
+                        "DARK" -> "Dark theme enabled"
+                        "LIGHT" -> "Light theme enabled"
+                        else -> "Following system (${if (isSystemDark) "Dark" else "Light"})"
+                    },
+                    checked = isDarkActive,
+                    icon = if (isDarkActive) Icons.Default.DarkMode else Icons.Default.LightMode
+                ) { isChecked ->
+                    settingsViewModel.updateThemeMode(if (isChecked) "DARK" else "LIGHT")
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                )
+
+                SettingsClickable(
+                    title = "Theme Mode",
+                    value = when (settingsState.themeMode) {
+                        "DARK" -> "Dark Theme"
+                        "LIGHT" -> "Light Theme"
+                        else -> "System Default"
+                    },
+                    icon = when (settingsState.themeMode) {
+                        "DARK" -> Icons.Default.DarkMode
+                        "LIGHT" -> Icons.Default.LightMode
+                        else -> Icons.Default.BrightnessAuto
+                    }
+                ) {
+                    showThemeDialog = true
+                }
+
+                HorizontalDivider(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
+                )
+
                 SettingsClickable("Accent Color", settingsState.accentColor, Icons.Default.ColorLens) {
                     val nextColor = when(settingsState.accentColor) {
                         "Cyan" -> "Gold"
@@ -112,7 +171,7 @@ fun SettingsScreen(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
                     horizontalArrangement = Arrangement.Center
                 ) {
-                    Text("Version 1.0.0 (Production Build)", color = TextMuted, style = MaterialTheme.typography.labelMedium)
+                    Text("Version 1.0.0 (Production Build)", color = MaterialTheme.colorScheme.onSurfaceVariant, style = MaterialTheme.typography.labelMedium)
                 }
             }
             
@@ -157,12 +216,12 @@ fun SettingsToggle(
         verticalAlignment = Alignment.CenterVertically
     ) {
         if (icon != null) {
-            Icon(icon, null, tint = TextMuted, modifier = Modifier.size(24.dp))
+            Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
             Spacer(modifier = Modifier.width(16.dp))
         }
         Column(modifier = Modifier.weight(1f)) {
             Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-            Text(subtitle, style = MaterialTheme.typography.labelSmall, color = TextMuted)
+            Text(subtitle, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         }
         Switch(
             checked = checked,
@@ -171,7 +230,7 @@ fun SettingsToggle(
                 checkedThumbColor = Color.White,
                 checkedTrackColor = MaterialTheme.colorScheme.primary,
                 uncheckedThumbColor = Color.White,
-                uncheckedTrackColor = TextMuted.copy(alpha = 0.3f)
+                uncheckedTrackColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f)
             )
         )
     }
@@ -191,7 +250,7 @@ fun SettingsClickable(
             .padding(16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, null, tint = TextMuted, modifier = Modifier.size(24.dp))
+        Icon(icon, null, tint = MaterialTheme.colorScheme.onSurfaceVariant, modifier = Modifier.size(24.dp))
         Spacer(modifier = Modifier.width(16.dp))
         Column(modifier = Modifier.weight(1f)) {
             Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
@@ -199,6 +258,94 @@ fun SettingsClickable(
                 Text(value, style = MaterialTheme.typography.labelSmall, color = MaterialTheme.colorScheme.primary)
             }
         }
-        Icon(Icons.Default.ChevronRight, null, tint = TextMuted)
+        Icon(Icons.Default.ChevronRight, null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
     }
+}
+
+@Composable
+fun ThemeSelectionDialog(
+    currentTheme: String,
+    onThemeSelected: (String) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val options = listOf(
+        Triple("SYSTEM", "System Default", Icons.Default.BrightnessAuto to "Follow your device's system appearance"),
+        Triple("LIGHT", "Light Theme", Icons.Default.LightMode to "Clean, bright display for daytime"),
+        Triple("DARK", "Dark Theme", Icons.Default.DarkMode to "Dark, sleek display for lower eye strain")
+    )
+
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        containerColor = MaterialTheme.colorScheme.surface,
+        title = {
+            Text(
+                "Select Theme",
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        },
+        text = {
+            Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                options.forEach { (mode, title, details) ->
+                    val (icon, subtitle) = details
+                    val isSelected = currentTheme == mode
+                    Surface(
+                        onClick = {
+                            onThemeSelected(mode)
+                            onDismiss()
+                        },
+                        shape = RoundedCornerShape(12.dp),
+                        color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.12f) else Color.Transparent,
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 12.dp, vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Spacer(modifier = Modifier.width(14.dp))
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = title,
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = subtitle,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                            RadioButton(
+                                selected = isSelected,
+                                onClick = {
+                                    onThemeSelected(mode)
+                                    onDismiss()
+                                },
+                                colors = RadioButtonDefaults.colors(
+                                    selectedColor = MaterialTheme.colorScheme.primary,
+                                    unselectedColor = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            )
+                        }
+                    }
+                }
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onDismiss) {
+                Text("CANCEL", fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+            }
+        },
+        shape = RoundedCornerShape(24.dp)
+    )
 }
