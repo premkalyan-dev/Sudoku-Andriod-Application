@@ -139,7 +139,7 @@ fun DailyRewardScreen(
                                 )
                                 Spacer(modifier = Modifier.width(4.dp))
                                 Text(
-                                    text = "${info.hintInventory}/3",
+                                    text = "${info.hintInventory}",
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 13.sp,
                                     color = EasyGreen
@@ -690,11 +690,7 @@ fun MysteryGiftDialog(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = if (result.creditedHints < result.selectedHints) {
-                            "Inventory capacity is max 3 hints. Added ${result.creditedHints} hint(s) to your inventory."
-                        } else {
-                            "All ${result.selectedHints} hint(s) credited to your inventory."
-                        },
+                        text = "All ${result.selectedHints} hint(s) added to your inventory.",
                         style = MaterialTheme.typography.bodySmall,
                         color = TextMuted,
                         textAlign = TextAlign.Center
@@ -707,7 +703,7 @@ fun MysteryGiftDialog(
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)
                     ) {
                         Text(
-                            text = "Current Hint Inventory: ${result.totalHintInventory}/3",
+                            text = "Current Hint Inventory: ${result.totalHintInventory}",
                             style = MaterialTheme.typography.labelMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface,

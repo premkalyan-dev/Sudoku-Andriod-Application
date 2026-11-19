@@ -18,6 +18,7 @@ data class GameState(
     val mistakes: Int = 0,
     val maxMistakes: Int = 3,
     val hintsRemaining: Int = 3,
+    val hintsUsed: Int = 0,
     val isNotesMode: Boolean = false,
     val timerSeconds: Long = 0,
     val isPaused: Boolean = false,

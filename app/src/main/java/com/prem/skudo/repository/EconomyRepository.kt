@@ -50,43 +50,30 @@ class EconomyRepository(context: Context) {
         return true
     }
 
-    companion object {
-        const val MAX_HINT_CAPACITY = 3
-    }
-
     /**
-     * Credits hints to the user's inventory strictly respecting the MAX_HINT_CAPACITY (3).
-     * Returns the actual number of hints credited (which may be 0 if inventory is already full).
-     * Never allows inventory to exceed 3 or become negative.
+     * Credits hints to the user's inventory without any global upper limit.
+     * Returns the number of hints credited.
      */
     suspend fun creditHints(count: Int): Int {
         if (count <= 0) return 0
         val profile = userDao.getUserProfile() ?: return 0
         val currentHints = profile.hints.coerceAtLeast(0)
-        val availableCapacity = (MAX_HINT_CAPACITY - currentHints).coerceAtLeast(0)
-        val hintsToCredit = count.coerceAtMost(availableCapacity)
-
-        if (hintsToCredit > 0) {
-            val updatedProfile = profile.copy(
-                hints = currentHints + hintsToCredit,
-                updatedAt = System.currentTimeMillis()
-            )
-            userDao.updateProfile(updatedProfile)
-        }
-        return hintsToCredit
+        val updatedProfile = profile.copy(
+            hints = currentHints + count,
+            updatedAt = System.currentTimeMillis()
+        )
+        userDao.updateProfile(updatedProfile)
+        return count
     }
 
     suspend fun addHints(count: Int, cost: Long): Boolean {
         val profile = userDao.getUserProfile() ?: return false
-        val currentHints = profile.hints.coerceAtLeast(0)
-        if (currentHints >= MAX_HINT_CAPACITY) return false
         if (profile.coins < cost) return false
 
         if (spendCoins(cost)) {
-            val available = (MAX_HINT_CAPACITY - currentHints).coerceAtLeast(0)
-            val toAdd = count.coerceAtMost(available)
+            val currentHints = (userDao.getUserProfile()?.hints ?: 0).coerceAtLeast(0)
             val updatedProfile = userDao.getUserProfile()?.copy(
-                hints = currentHints + toAdd,
+                hints = currentHints + count,
                 updatedAt = System.currentTimeMillis()
             ) ?: return false
             userDao.updateProfile(updatedProfile)

@@ -87,64 +87,58 @@ class DailyRewardSystemTest {
     }
 
     // ==========================================
-    // 2. HINT INVENTORY RESTRICTIONS (Section 4)
+    // 2. HINT INVENTORY UNLIMITED ACCUMULATION & REWARD TESTS
     // ==========================================
 
-    private fun calculateCreditedHints(existingHints: Int, awardHints: Int): Pair<Int, Int> {
-        val current = existingHints.coerceAtLeast(0)
-        val available = (EconomyRepository.MAX_HINT_CAPACITY - current).coerceAtLeast(0)
-        val credited = awardHints.coerceAtMost(available)
-        val finalInventory = (current + credited).coerceIn(0, EconomyRepository.MAX_HINT_CAPACITY)
-        return credited to finalInventory
+    @Test
+    fun `Hint inventory accumulates without upper limit for 0, 3, 5, 10, and 20 existing hints`() {
+        fun creditHints(existingHints: Int, added: Int): Int {
+            val current = existingHints.coerceAtLeast(0)
+            return current + added
+        }
+
+        // User with 0 hints receives 3 hints -> 3
+        assertEquals(3, creditHints(0, 3))
+
+        // User with 3 hints receives 2 hints (e.g. Day 3) -> 5
+        assertEquals(5, creditHints(3, 2))
+
+        // User with 5 hints receives 3 hints (e.g. Day 6) -> 8
+        assertEquals(8, creditHints(5, 3))
+
+        // User with 10 hints receives 3 hints (e.g. Day 7 Mystery Gift) -> 13
+        assertEquals(13, creditHints(10, 3))
+
+        // User with 20 hints receives 3 hints -> 23
+        assertEquals(23, creditHints(20, 3))
     }
 
     @Test
-    fun `Hint Inventory exact test cases from Section 4 table`() {
-        // Table row 1: Existing 0, Gift 1 -> Credited 1, Final 1
-        val (c1, f1) = calculateCreditedHints(0, 1)
-        assertEquals(1, c1)
-        assertEquals(1, f1)
+    fun `Shop hint purchases accumulate without restriction on large balances`() {
+        fun addShopHints(existingHints: Int, packCount: Int): Int {
+            return existingHints.coerceAtLeast(0) + packCount
+        }
 
-        // Table row 2: Existing 0, Gift 2 -> Credited 2, Final 2
-        val (c2, f2) = calculateCreditedHints(0, 2)
-        assertEquals(2, c2)
-        assertEquals(2, f2)
+        // User with 3 hints buys 5 hints pack -> 8
+        assertEquals(8, addShopHints(3, 5))
 
-        // Table row 3: Existing 0, Gift 3 -> Credited 3, Final 3
-        val (c3, f3) = calculateCreditedHints(0, 3)
-        assertEquals(3, c3)
-        assertEquals(3, f3)
+        // User with 10 hints buys 15 hints pack -> 25
+        assertEquals(25, addShopHints(10, 15))
 
-        // Table row 4: Existing 1, Gift 1 -> Credited 1, Final 2
-        val (c4, f4) = calculateCreditedHints(1, 1)
-        assertEquals(1, c4)
-        assertEquals(2, f4)
-
-        // Table row 5: Existing 1, Gift 3 -> Credited 2, Final 3
-        val (c5, f5) = calculateCreditedHints(1, 3)
-        assertEquals(2, c5)
-        assertEquals(3, f5)
-
-        // Table row 6: Existing 2, Gift 2 -> Credited 1, Final 3
-        val (c6, f6) = calculateCreditedHints(2, 2)
-        assertEquals(1, c6)
-        assertEquals(3, f6)
-
-        // Table row 7: Existing 3, Gift 3 -> Credited 0, Final 3
-        val (c7, f7) = calculateCreditedHints(3, 3)
-        assertEquals(0, c7)
-        assertEquals(3, f7)
+        // User with 20 hints buys 60 hints pack -> 80
+        assertEquals(80, addShopHints(20, 60))
     }
 
     @Test
-    fun `Hint inventory never exceeds 3 and never becomes negative`() {
-        val (_, f1) = calculateCreditedHints(3, 10)
-        assertEquals(3, f1)
+    fun `Hint consumption reduces inventory and never goes negative`() {
+        fun consumeHint(currentHints: Int): Int {
+            return (currentHints - 1).coerceAtLeast(0)
+        }
 
-        val (_, f2) = calculateCreditedHints(-5, 2)
-        assertEquals(2, f2)
-        assertTrue(f2 >= 0)
-        assertTrue(f2 <= 3)
+        assertEquals(2, consumeHint(3))
+        assertEquals(9, consumeHint(10))
+        assertEquals(0, consumeHint(1))
+        assertEquals(0, consumeHint(0)) // Prevents negative
     }
 
     // ==========================================

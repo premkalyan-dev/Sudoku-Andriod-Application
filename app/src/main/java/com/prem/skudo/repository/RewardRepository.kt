@@ -208,16 +208,11 @@ class RewardRepository(context: Context) {
         val config = DailyRewardSchedule.getConfig(newCycleDay)
         val coinsAwarded = config.coins
         val hintsAwarded = config.hints
-        var hintsCredited = 0
-
-        if (hintsAwarded > 0) {
-            val capacity = (EconomyRepository.MAX_HINT_CAPACITY - profile.hints).coerceAtLeast(0)
-            hintsCredited = hintsAwarded.coerceAtMost(capacity)
-        }
+        val hintsCredited = hintsAwarded
 
         var createdGiftId: String? = null
         if (config.hasMysteryGift) {
-            // Randomly select 1, 2, or 3 hints securely on backend
+            // Day 7 Mystery Gift Box randomly awards 1, 2, or 3 hints
             val selectedHints = Random.nextInt(1, 4)
             val gift = MysteryGift(
                 userId = profile.userId,
@@ -243,7 +238,7 @@ class RewardRepository(context: Context) {
         dailyRewardDao.insertClaim(claimRecord)
 
         val updatedCoins = profile.coins + coinsAwarded
-        val updatedHints = (profile.hints + hintsCredited).coerceIn(0, EconomyRepository.MAX_HINT_CAPACITY)
+        val updatedHints = (profile.hints + hintsCredited).coerceAtLeast(0)
 
         val updatedProfile = profile.copy(
             coins = updatedCoins,
@@ -261,7 +256,6 @@ class RewardRepository(context: Context) {
         val msg = when {
             config.hasMysteryGift -> "Claimed 25 Coins and unlocked a Mystery Gift Box!"
             coinsAwarded > 0 -> "Claimed $coinsAwarded Coins!"
-            hintsCredited < hintsAwarded -> "Claimed $hintsAwarded Hints! ($hintsCredited added to inventory, max capacity of 3 reached)."
             else -> "Claimed $hintsAwarded Hints!"
         }
 
@@ -307,9 +301,10 @@ class RewardRepository(context: Context) {
             )
         }
 
-        val capacity = (EconomyRepository.MAX_HINT_CAPACITY - profile.hints).coerceAtLeast(0)
-        val credited = gift.selectedHints.coerceAtMost(capacity)
-        val newHints = (profile.hints + credited).coerceIn(0, EconomyRepository.MAX_HINT_CAPACITY)
+        // Day 7 mystery gift awards 1, 2, or 3 hints without restricting total inventory
+        val selectedHints = gift.selectedHints.coerceIn(1, 3)
+        val credited = selectedHints
+        val newHints = (profile.hints + credited).coerceAtLeast(0)
 
         userDao.updateProfile(
             profile.copy(
@@ -326,17 +321,13 @@ class RewardRepository(context: Context) {
             )
         )
 
-        val msg = if (credited < gift.selectedHints) {
-            "Revealed ${gift.selectedHints} Hints! ($credited added, maximum capacity of 3 reached)."
-        } else {
-            "Revealed ${gift.selectedHints} Hints!"
-        }
+        val msg = "Revealed $credited Hints! Added to your inventory."
 
         return@withLock OpenMysteryGiftResult(
             success = true,
             message = msg,
             giftId = gift.id,
-            selectedHints = gift.selectedHints,
+            selectedHints = selectedHints,
             creditedHints = credited,
             totalHintInventory = newHints,
             alreadyRevealed = false

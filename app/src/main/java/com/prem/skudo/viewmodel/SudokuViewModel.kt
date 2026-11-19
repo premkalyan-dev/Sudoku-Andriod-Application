@@ -554,7 +554,10 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
         }
 
         _uiState.update { currentState ->
-            val updatedHints = currentState.copy(hintsRemaining = currentState.hintsRemaining - 1)
+            val updatedHints = currentState.copy(
+                hintsRemaining = currentState.hintsRemaining - 1,
+                hintsUsed = currentState.hintsUsed + 1
+            )
             val newState = updateCellInternal(updatedHints, r, c, value)
             checkCompletions(newState, r, c)
         }
@@ -687,7 +690,7 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
 
             viewModelScope.launch(Dispatchers.IO) {
                 try {
-                    val hintsUsed = 3 - state.hintsRemaining
+                    val hintsUsed = state.hintsUsed
                     
                     val rewards = rewardRepository.processGameResult(
                         state.difficulty,
@@ -893,14 +896,14 @@ class SudokuViewModel(application: Application) : AndroidViewModel(application) 
                 currentState.difficulty,
                 finalTime,
                 currentState.mistakes,
-                3 - currentState.hintsRemaining,
+                currentState.hintsUsed,
                 isWin = false
             )
             repository.addGameToHistory(
                 currentState.difficulty,
                 finalTime,
                 currentState.mistakes,
-                3 - currentState.hintsRemaining,
+                currentState.hintsUsed,
                 isWin = false,
                 isDaily = currentState.isDailyChallenge
             )
