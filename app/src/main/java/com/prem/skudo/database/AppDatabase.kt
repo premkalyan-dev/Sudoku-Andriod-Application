@@ -102,7 +102,7 @@ interface DailyChallengeDao {
     fun getCompletedChallenges(): Flow<List<DailyChallenge>>
 }
 
-@Database(entities = [GameStats::class, SavedGame::class, UserProfile::class, Achievement::class, GameHistory::class, DailyChallenge::class, DailyClaimHistory::class, MysteryGift::class], version = 11, exportSchema = false)
+@Database(entities = [GameStats::class, SavedGame::class, UserProfile::class, Achievement::class, GameHistory::class, DailyChallenge::class, DailyClaimHistory::class, MysteryGift::class], version = 12, exportSchema = false)
 @TypeConverters(DifficultyConverter::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun statsDao(): StatsDao
@@ -124,11 +124,27 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     "sudoku_database"
                 )
-                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11)
+                .addMigrations(MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8, MIGRATION_8_9, MIGRATION_9_10, MIGRATION_10_11, MIGRATION_11_12)
                 .fallbackToDestructiveMigration(true)
                 .build()
                 INSTANCE = instance
                 instance
+            }
+        }
+
+        private val MIGRATION_11_12 = object : androidx.room.migration.Migration(11, 12) {
+            override fun migrate(db: androidx.sqlite.db.SupportSQLiteDatabase) {
+                ensureColumnExists(db, "user_profile", "devCoinsDeducted", "INTEGER NOT NULL DEFAULT 0")
+                db.execSQL("""
+                    UPDATE user_profile
+                    SET coins = CASE
+                        WHEN coins >= 20000 THEN coins - 20000
+                        ELSE 0
+                    END,
+                    devCoinsDeducted = 1,
+                    updatedAt = ${System.currentTimeMillis()}
+                    WHERE devCoinsDeducted = 0
+                """.trimIndent())
             }
         }
 

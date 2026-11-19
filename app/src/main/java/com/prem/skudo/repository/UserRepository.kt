@@ -17,10 +17,15 @@ class UserRepository(context: Context) {
     suspend fun getOrCreateProfile(): UserProfile {
         var profile = userDao.getUserProfile()
         if (profile == null) {
-            profile = UserProfile(coins = 20000L)
+            profile = UserProfile(coins = 0L, devCoinsDeducted = true)
             userDao.insertProfile(profile)
-        } else if (profile.coins < 20000L) {
-            profile = profile.copy(coins = 20000L)
+        } else if (!profile.devCoinsDeducted) {
+            val newCoins = if (profile.coins >= 20000L) profile.coins - 20000L else 0L
+            profile = profile.copy(
+                coins = newCoins,
+                devCoinsDeducted = true,
+                updatedAt = System.currentTimeMillis()
+            )
             userDao.updateProfile(profile)
         }
         return profile
